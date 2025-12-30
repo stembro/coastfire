@@ -88,7 +88,7 @@
     <header class="bg-slate-900 text-white shadow-lg sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 py-3 sm:px-6 lg:px-8 flex justify-between items-center">
             <div class="flex items-center space-x-3">
-                <svg class="w-8 h-8 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                <svg class="w-8 h-8 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
                 <div>
                     <h1 class="text-lg sm:text-xl font-bold tracking-tight">Retirement Architect</h1>
                     <p class="text-slate-400 text-[10px] sm:text-xs">Tax-Aware Coast FIRE & Monte Carlo</p>
@@ -172,6 +172,23 @@
                     <div class="space-y-4">
                         <div data-help="retire-return"><div class="flex justify-between text-xs font-semibold text-slate-600 mb-1 items-center"><span>Retirement Return (%)</span><input type="number" id="num-retireReturn" class="editable-num text-emerald-600 text-right w-24" step="0.1"></div><input type="range" id="retireReturn" min="0" max="10" step="0.1" class="w-full slider-ret"></div>
                         <div data-help="expenses"><div class="flex justify-between text-xs font-semibold text-slate-600 mb-1 items-center"><span>Annual Expenses (Net)</span><input type="number" id="num-expenses" class="editable-num text-emerald-600 text-right w-24" step="1000"></div><input type="range" id="expenses" min="20000" max="200000" step="1000" class="w-full slider-ret"></div>
+                        
+                        <!-- Late Life Spending -->
+                        <div class="bg-indigo-50 p-2 rounded border border-indigo-100" data-help="late-spending">
+                            <label class="text-[10px] font-bold text-indigo-800 uppercase block mb-1">Late-Life Spending Adjustment</label>
+                            <div class="flex gap-2 items-center">
+                                <div class="flex-1">
+                                    <span class="text-[9px] text-slate-500 block">Start Age</span>
+                                    <input type="number" id="num-lateSpendAge" class="bg-white border border-slate-200 rounded text-xs p-1 w-full text-center" value="80">
+                                </div>
+                                <div class="flex-1">
+                                    <span class="text-[9px] text-slate-500 block">% of Baseline</span>
+                                    <input type="number" id="num-lateSpendLevel" class="bg-white border border-slate-200 rounded text-xs p-1 w-full text-center" value="100">
+                                </div>
+                            </div>
+                            <p class="text-[9px] text-slate-400 mt-1 leading-tight">Models reduced spending in later years (e.g. 85% at age 80).</p>
+                        </div>
+
                         <div class="bg-slate-50 p-3 rounded border border-slate-100 mt-2" data-help="tax-rates">
                             <p class="text-[10px] font-bold text-slate-500 uppercase mb-2">Tax Assumptions</p>
                             <div class="grid grid-cols-2 gap-4">
@@ -320,6 +337,7 @@
                 'inflation': { title: "Inflation", desc: "Annual increase in cost of living. All future values are adjusted by this rate." },
                 'retire-return': { title: "Retirement Return", desc: "Usually lower than accumulation return to account for a more conservative asset allocation in retirement." },
                 'expenses': { title: "Annual Expenses", desc: "Your desired spending in retirement, in today's dollars. This will be inflated automatically." },
+                'late-spending': { title: "Late-Life Spending Adjustment", desc: "Allows you to simulate reduced spending in later years (the 'Slow-Go' or 'No-Go' phases of retirement). For example, at age 85, you might only need 80% of your inflation-adjusted baseline expenses." },
                 'tax-rates': { title: "Tax Rates", desc: "Estimated effective tax rates. Income Tax applies to 401k/IRA withdrawals. Cap Gains applies to ~50% of Brokerage withdrawals." },
                 'swr': { title: "Safe Withdrawal Rate", desc: "The percentage of your portfolio you plan to withdraw annually. Used to calculate your 'FI Number' target and Coast Readiness." },
                 'social-security': { title: "Social Security", desc: "Estimated benefits. 'Payout Ratio' allows you to model benefit cuts (e.g. 75%)." },
@@ -354,13 +372,15 @@
             ssAmount: 2500,
             ssSpouseCurrentAge: 35,
             ssSpouseAge: 67,
-            ssSpouseAmount: 0
+            ssSpouseAmount: 0,
+            lateSpendAge: 80,
+            lateSpendLevel: 100
         };
 
         const inputs = {}; 
         
         function bindInput(id, defaultValue) {
-            if (['ssSpouseCurrentAge', 'savingsTaxable', 'savingsDeferred', 'savingsFree', 'contribTaxable', 'contribDeferred', 'contribFree', 'taxRateIncome', 'taxRateCap'].includes(id)) {
+            if (['ssSpouseCurrentAge', 'savingsTaxable', 'savingsDeferred', 'savingsFree', 'contribTaxable', 'contribDeferred', 'contribFree', 'taxRateIncome', 'taxRateCap', 'lateSpendAge', 'lateSpendLevel'].includes(id)) {
                 const num = document.getElementById('num-' + id);
                 if (num) { num.value = defaultValue; num.addEventListener('input', calculate); inputs[id] = { num }; }
                 return;
@@ -657,6 +677,12 @@
 
                 let totalTaxPaid=0, netFlowDisplay=0, flow=0, withdrawTaxable=0, withdrawDeferred=0, withdrawFree=0;
 
+                // --- Calculate Effective Expenses (Applying Late Life Adjustment) ---
+                let effectiveExpenses = expenses;
+                if (age >= p.lateSpendAge) {
+                    effectiveExpenses = expenses * (p.lateSpendLevel / 100);
+                }
+
                 if (!isRetired) {
                     if (isContributing) {
                         portTaxable+=cTax; portDeferred+=cDef; portFree+=cFree;
@@ -666,7 +692,8 @@
                     const extraCash = ssTotal + eventsSum; portTaxable+=extraCash; flow+=extraCash; netFlowDisplay=flow;
                     if (isContributing) { cTax*=(1+inf); cDef*=(1+inf); cFree*=(1+inf); }
                 } else {
-                    let gap = expenses - (ssTotal + eventsSum);
+                    // Use effectiveExpenses for gap calculation
+                    let gap = effectiveExpenses - (ssTotal + eventsSum);
                     if (gap < 0) { portTaxable+=Math.abs(gap); flow+=Math.abs(gap); } 
                     else {
                         let remainingNeed = gap;
@@ -686,8 +713,13 @@
                     netFlowDisplay = flow;
                 }
                 let totalPort = Math.max(0, portTaxable+portDeferred+portFree);
-                trajectory.push({ age, year, startTaxable, startDeferred, startFree, endTaxable:portTaxable, endDeferred:portDeferred, endFree:portFree, growthTaxable:startTaxable*rCurrent, growthDeferred:startDeferred*rCurrent, growthFree:startFree*rCurrent, rCurrent, isRetired, isCoasting, expenses, ssTotal, eventsSum, eventDetails, drawdown:netFlowDisplay, totalTaxPaid, withdrawTaxable, withdrawDeferred, withdrawFree, inflationFactor, startPort:startTaxable+startDeferred+startFree, portfolio:totalPort, growth:totalGrowth });
-                expenses*=(1+inf); age++; year++;
+                
+                // Note: We report effectiveExpenses in the trajectory for audit transparency
+                trajectory.push({ age, year, startTaxable, startDeferred, startFree, endTaxable:portTaxable, endDeferred:portDeferred, endFree:portFree, growthTaxable:startTaxable*rCurrent, growthDeferred:startDeferred*rCurrent, growthFree:startFree*rCurrent, rCurrent, isRetired, isCoasting, expenses: effectiveExpenses, ssTotal, eventsSum, eventDetails, drawdown:netFlowDisplay, totalTaxPaid, withdrawTaxable, withdrawDeferred, withdrawFree, inflationFactor, startPort:startTaxable+startDeferred+startFree, portfolio:totalPort, growth:totalGrowth });
+                
+                // Base expenses continue to inflate normally so we maintain the standard of living baseline
+                expenses*=(1+inf); 
+                age++; year++;
             }
             return { trajectory, tippingAge };
         }
@@ -696,6 +728,7 @@
             const sim = simulateTrajectory(p, false, stopAge);
             const retireData = sim.trajectory.find(d => d.age === p.retireAge);
             if(!retireData) return false;
+            // SWR check against *effective* expenses at retirement
             return (retireData.portfolio * (p.swr/100)) >= (retireData.expenses - retireData.ssTotal);
         }
 
