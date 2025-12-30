@@ -4,57 +4,42 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Advanced Retirement Planner</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Marked for Markdown Parsing in Chat -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
-        /* Custom range slider styling */
         input[type=range] { -webkit-appearance: none; background: transparent; }
         input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%; background: #4F46E5; cursor: pointer; margin-top: -6px; box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
         input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: #E5E7EB; border-radius: 2px; }
-        
         .slider-acc::-webkit-slider-thumb { background: #4F46E5; }
         .slider-ret::-webkit-slider-thumb { background: #10B981; }
         .slider-ss::-webkit-slider-thumb { background: #F59E0B; }
-        
         .scrolly-table::-webkit-scrollbar { width: 8px; height: 8px; }
         .scrolly-table::-webkit-scrollbar-track { background: #f1f1f1; }
         .scrolly-table::-webkit-scrollbar-thumb { background: #c7c7c7; border-radius: 4px; }
-
         .editable-num { background: transparent; border: none; border-bottom: 1px solid transparent; text-align: left; width: 100%; font-weight: 700; padding: 0; transition: all 0.2s; }
         .editable-num:hover { border-bottom: 1px solid #cbd5e1; }
         .editable-num:focus { outline: none; border-bottom: 2px solid #4F46E5; background: #f8fafc; }
         .editable-num::-webkit-outer-spin-button, .editable-num::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-        
         .modal-backdrop { background-color: rgba(15, 23, 42, 0.7); }
         .bucket-label { font-size: 10px; font-weight: 700; text-transform: uppercase; color: #64748b; margin-bottom: 2px; }
         .bucket-input { width: 100%; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 4px; padding: 4px 8px; font-size: 12px; font-family: monospace; color: #334155; }
         .bucket-input:focus { outline: none; border-color: #6366f1; background: white; }
-
-        /* Help & Chat */
         #help-tooltip { pointer-events: none; transition: opacity 0.2s; }
-        .help-mode-active { cursor: help !important; }
         .help-highlight::after { content: ''; position: absolute; top: -2px; left: -2px; right: -2px; bottom: -2px; border: 2px dashed #a5b4fc; border-radius: 6px; pointer-events: none; z-index: 10; }
         .chat-bubble { max-width: 85%; padding: 8px 12px; border-radius: 12px; font-size: 13px; line-height: 1.4; margin-bottom: 8px; }
         .chat-user { background: #e0e7ff; color: #3730a3; align-self: flex-end; border-bottom-right-radius: 2px; }
         .chat-ai { background: #f1f5f9; color: #334155; align-self: flex-start; border-bottom-left-radius: 2px; }
         .chat-system { font-size: 11px; color: #94a3b8; text-align: center; margin: 8px 0; }
-        
-        /* Test Runner */
-        .test-pass { color: #10b981; }
-        .test-fail { color: #ef4444; font-weight: bold; }
+        .test-pass { color: #10b981; } .test-fail { color: #ef4444; font-weight: bold; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col relative">
 
-    <!-- Help Tooltip -->
     <div id="help-tooltip" class="fixed hidden z-[9999] max-w-xs bg-slate-800 text-white text-xs p-3 rounded shadow-xl border border-slate-700">
         <div class="font-bold text-indigo-300 mb-1" id="help-title">Title</div>
         <div id="help-desc" class="opacity-90 leading-relaxed">Description</div>
     </div>
 
-    <!-- Header -->
     <header class="bg-slate-900 text-white shadow-lg sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 py-3 sm:px-6 lg:px-8 flex justify-between items-center">
             <div class="flex items-center space-x-3">
@@ -64,18 +49,10 @@
                     <p class="text-slate-400 text-[10px] sm:text-xs">Tax-Aware Coast FIRE & Monte Carlo</p>
                 </div>
             </div>
-            
             <div class="text-right">
                 <div class="flex justify-end items-center mb-1 gap-2">
-                    <button onclick="app.toggleCopilot()" data-help="copilot" class="text-[10px] uppercase font-bold bg-gradient-to-r from-indigo-500 to-purple-600 text-white hover:from-indigo-600 hover:to-purple-700 rounded px-2 py-0.5 transition-all flex items-center gap-1 shadow-sm">
-                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg> AI Copilot
-                    </button>
-                    <button onclick="tests.run()" class="text-[10px] uppercase font-bold text-emerald-400 hover:text-white border border-emerald-600 rounded px-2 py-0.5 transition-colors flex items-center gap-1">
-                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Tests
-                    </button>
-                    <button onclick="app.toggleHelpMode()" id="btn-help-mode" class="text-[10px] uppercase font-bold text-slate-400 hover:text-white border border-slate-600 rounded px-2 py-0.5 transition-colors flex items-center gap-1">
-                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Help
-                    </button>
+                    <button onclick="app.toggleCopilot()" data-help="copilot" class="text-[10px] uppercase font-bold bg-gradient-to-r from-indigo-500 to-purple-600 text-white hover:from-indigo-600 hover:to-purple-700 rounded px-2 py-0.5 transition-all flex items-center gap-1 shadow-sm"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg> AI Copilot</button>
+                    <button onclick="tests.open()" class="text-[10px] uppercase font-bold text-emerald-400 hover:text-white border border-emerald-600 rounded px-2 py-0.5 transition-colors flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Tests</button>
                     <input id="scenario-name" type="text" class="text-right bg-transparent border-b border-transparent hover:border-slate-500 focus:border-indigo-400 text-sm font-bold text-white w-32 sm:w-48 focus:outline-none placeholder-slate-500" placeholder="Scenario Name">
                 </div>
                 <div class="flex justify-end gap-3 text-[10px] text-indigo-300 font-medium" data-help="persistence">
@@ -91,26 +68,24 @@
 
     <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div class="grid grid-cols-1 xl:grid-cols-12 gap-8">
-            <!-- LEFT SIDEBAR: CONTROLS -->
             <div class="xl:col-span-4 space-y-6 h-fit">
-                <!-- SECTION 1: PROFILE -->
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5" data-help="profile">
-                    <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 border-b pb-2">1. Profile & Timeline</h2>
+                    <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 border-b pb-2 flex items-center">1. Profile & Timeline <svg class="w-3 h-3 ml-1 text-slate-300 hover:text-indigo-500 cursor-help" fill="none" stroke="currentColor" viewBox="0 0 24 24" onmouseenter="app.showHelp(this, 'profile')" onmouseleave="app.hideHelp()"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></h2>
                     <div class="space-y-6">
                         <div class="grid grid-cols-3 gap-4">
                             <div data-help="age"><label class="text-[10px] uppercase font-bold text-slate-400 block mb-1">Start Age</label><input type="number" id="num-age" class="editable-num text-slate-700 text-xl"><input type="range" id="age" min="18" max="70" class="w-full slider-acc mt-2"></div>
-                            <div data-help="stop-contrib"><label class="text-[10px] uppercase font-bold text-indigo-400 block mb-1">Stop Saving</label><input type="number" id="num-stopContribAge" class="editable-num text-indigo-600 text-xl"><input type="range" id="stopContribAge" min="25" max="80" class="w-full slider-acc mt-2"></div>
+                            <div data-help="stop-contrib"><label class="text-[10px] uppercase font-bold text-indigo-400 block mb-1">Stop Saving <svg class="w-3 h-3 inline-block ml-0.5 text-slate-300 hover:text-indigo-500 cursor-help" fill="none" stroke="currentColor" viewBox="0 0 24 24" onmouseenter="app.showHelp(this, 'stop-contrib')" onmouseleave="app.hideHelp()"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></label><input type="number" id="num-stopContribAge" class="editable-num text-indigo-600 text-xl"><input type="range" id="stopContribAge" min="25" max="80" class="w-full slider-acc mt-2"></div>
                             <div data-help="retire-age"><label class="text-[10px] uppercase font-bold text-emerald-500 block mb-1">Retire Age</label><input type="number" id="num-retireAge" class="editable-num text-emerald-600 text-xl"><input type="range" id="retireAge" min="40" max="80" class="w-full slider-ret mt-2"></div>
                         </div>
                         <div class="pt-2" data-help="buckets">
-                            <div class="flex justify-between items-end mb-2"><h3 class="text-xs font-bold text-slate-700">Portfolio Buckets</h3><span class="text-[10px] text-slate-400">Total: <span id="total-savings-display" class="font-mono text-indigo-600 font-bold">$0</span></span></div>
+                            <div class="flex justify-between items-end mb-2"><h3 class="text-xs font-bold text-slate-700">Portfolio Buckets <svg class="w-3 h-3 inline-block ml-0.5 text-slate-300 hover:text-indigo-500 cursor-help" fill="none" stroke="currentColor" viewBox="0 0 24 24" onmouseenter="app.showHelp(this, 'buckets')" onmouseleave="app.hideHelp()"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></h3><span class="text-[10px] text-slate-400">Total: <span id="total-savings-display" class="font-mono text-indigo-600 font-bold">$0</span></span></div>
                             <div class="grid grid-cols-3 gap-2 mb-4"><div><label class="bucket-label text-orange-500">Taxable</label><input type="number" id="num-savingsTaxable" class="bucket-input" placeholder="0"></div><div><label class="bucket-label text-blue-500">Deferred</label><input type="number" id="num-savingsDeferred" class="bucket-input" placeholder="0"></div><div><label class="bucket-label text-emerald-500">Tax-Free</label><input type="number" id="num-savingsFree" class="bucket-input" placeholder="0"></div></div>
                             <div class="flex justify-between items-end mb-2"><h3 class="text-xs font-bold text-slate-700">Annual Contribution</h3><span class="text-[10px] text-slate-400">Total: <span id="total-contrib-display" class="font-mono text-indigo-600 font-bold">$0</span></span></div>
                             <div class="grid grid-cols-3 gap-2"><div><label class="bucket-label text-orange-500">Taxable</label><input type="number" id="num-contribTaxable" class="bucket-input" placeholder="0"></div><div><label class="bucket-label text-blue-500">Deferred</label><input type="number" id="num-contribDeferred" class="bucket-input" placeholder="0"></div><div><label class="bucket-label text-emerald-500">Tax-Free</label><input type="number" id="num-contribFree" class="bucket-input" placeholder="0"></div></div>
                         </div>
                         <div class="space-y-4 pt-2 border-t border-slate-100">
                             <div data-help="return"><div class="flex justify-between text-xs font-semibold text-slate-600 mb-1 items-center"><span>Accumulation Return (%)</span><input type="number" id="num-return" class="editable-num text-indigo-600 text-right w-24" step="0.1"></div><input type="range" id="return" min="1" max="12" step="0.1" class="w-full slider-acc"></div>
-                            <div data-help="volatility"><div class="flex justify-between text-xs font-semibold text-slate-600 mb-1 items-center"><span>Volatility / Std Dev (%)</span><input type="number" id="num-volatility" class="editable-num text-purple-600 text-right w-24" step="0.1"></div><input type="range" id="volatility" min="0" max="25" step="0.1" class="w-full slider-acc" style="accent-color: #9333ea;"></div>
+                            <div data-help="volatility"><div class="flex justify-between text-xs font-semibold text-slate-600 mb-1 items-center"><span>Volatility / Std Dev (%) <svg class="w-3 h-3 inline-block ml-0.5 text-slate-300 hover:text-indigo-500 cursor-help" fill="none" stroke="currentColor" viewBox="0 0 24 24" onmouseenter="app.showHelp(this, 'volatility')" onmouseleave="app.hideHelp()"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></span><input type="number" id="num-volatility" class="editable-num text-purple-600 text-right w-24" step="0.1"></div><input type="range" id="volatility" min="0" max="25" step="0.1" class="w-full slider-acc" style="accent-color: #9333ea;"></div>
                             <div data-help="inflation"><div class="flex justify-between text-xs font-semibold text-slate-600 mb-1 items-center"><span>Inflation (%)</span><input type="number" id="num-inflation" class="editable-num text-orange-500 text-right w-24" step="0.1"></div><input type="range" id="inflation" min="0" max="8" step="0.1" class="w-full slider-acc"></div>
                         </div>
                     </div>
@@ -122,24 +97,18 @@
                     <div class="space-y-4">
                         <div data-help="retire-return"><div class="flex justify-between text-xs font-semibold text-slate-600 mb-1 items-center"><span>Retirement Return (%)</span><input type="number" id="num-retireReturn" class="editable-num text-emerald-600 text-right w-24" step="0.1"></div><input type="range" id="retireReturn" min="0" max="10" step="0.1" class="w-full slider-ret"></div>
                         <div data-help="expenses"><div class="flex justify-between text-xs font-semibold text-slate-600 mb-1 items-center"><span>Annual Expenses (Net)</span><input type="number" id="num-expenses" class="editable-num text-emerald-600 text-right w-24" step="1000"></div><input type="range" id="expenses" min="20000" max="200000" step="1000" class="w-full slider-ret"></div>
-                        <div class="bg-indigo-50 p-2 rounded border border-indigo-100" data-help="late-spending">
-                            <label class="text-[10px] font-bold text-indigo-800 uppercase block mb-1">Late-Life Spending Adjustment</label>
-                            <div class="flex gap-2 items-center"><div class="flex-1"><span class="text-[9px] text-slate-500 block">Start Age</span><input type="number" id="num-lateSpendAge" class="bg-white border border-slate-200 rounded text-xs p-1 w-full text-center" value="80"></div><div class="flex-1"><span class="text-[9px] text-slate-500 block">% of Baseline</span><input type="number" id="num-lateSpendLevel" class="bg-white border border-slate-200 rounded text-xs p-1 w-full text-center" value="100"></div></div>
-                        </div>
+                        <div class="bg-indigo-50 p-2 rounded border border-indigo-100" data-help="late-spending"><label class="text-[10px] font-bold text-indigo-800 uppercase block mb-1">Late-Life Spending Adjustment <svg class="w-3 h-3 inline-block ml-0.5 text-slate-300 hover:text-indigo-500 cursor-help" fill="none" stroke="currentColor" viewBox="0 0 24 24" onmouseenter="app.showHelp(this, 'late-spending')" onmouseleave="app.hideHelp()"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></label><div class="flex gap-2 items-center"><div class="flex-1"><span class="text-[9px] text-slate-500 block">Start Age</span><input type="number" id="num-lateSpendAge" class="bg-white border border-slate-200 rounded text-xs p-1 w-full text-center" value="80"></div><div class="flex-1"><span class="text-[9px] text-slate-500 block">% of Baseline</span><input type="number" id="num-lateSpendLevel" class="bg-white border border-slate-200 rounded text-xs p-1 w-full text-center" value="100"></div></div></div>
                         <div class="bg-slate-50 p-3 rounded border border-slate-100 mt-2" data-help="tax-rates">
-                            <p class="text-[10px] font-bold text-slate-500 uppercase mb-2">Tax Assumptions</p>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div><label class="text-[10px] font-bold text-blue-500 block mb-1">Income Tax Rate</label><div class="flex items-center"><input type="number" id="num-taxRateIncome" class="bg-white border border-slate-200 rounded text-xs p-1 w-12 text-center" value="20"><span class="text-xs text-slate-400 ml-1">%</span></div></div>
-                                <div><label class="text-[10px] font-bold text-orange-500 block mb-1">Cap Gains Rate</label><div class="flex items-center"><input type="number" id="num-taxRateCap" class="bg-white border border-slate-200 rounded text-xs p-1 w-12 text-center" value="15"><span class="text-xs text-slate-400 ml-1">%</span></div></div>
-                            </div>
+                            <p class="text-[10px] font-bold text-slate-500 uppercase mb-2">Tax Assumptions <svg class="w-3 h-3 inline-block ml-0.5 text-slate-300 hover:text-indigo-500 cursor-help" fill="none" stroke="currentColor" viewBox="0 0 24 24" onmouseenter="app.showHelp(this, 'tax-rates')" onmouseleave="app.hideHelp()"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></p>
+                            <div class="grid grid-cols-2 gap-4"><div><label class="text-[10px] font-bold text-blue-500 block mb-1">Income Tax Rate</label><div class="flex items-center"><input type="number" id="num-taxRateIncome" class="bg-white border border-slate-200 rounded text-xs p-1 w-12 text-center" value="20"><span class="text-xs text-slate-400 ml-1">%</span></div></div><div><label class="text-[10px] font-bold text-orange-500 block mb-1">Cap Gains Rate</label><div class="flex items-center"><input type="number" id="num-taxRateCap" class="bg-white border border-slate-200 rounded text-xs p-1 w-12 text-center" value="15"><span class="text-xs text-slate-400 ml-1">%</span></div></div></div>
                         </div>
-                        <div class="mt-2" data-help="swr"><div class="flex justify-between text-xs font-semibold text-slate-600 mb-1 items-center"><span>Safe Withdrawal Rate (%)</span><input type="number" id="num-swr" class="editable-num text-emerald-600 text-right w-24" step="0.1"></div><input type="range" id="swr" min="2" max="6" step="0.1" class="w-full slider-ret"></div>
+                        <div class="mt-2" data-help="swr"><div class="flex justify-between text-xs font-semibold text-slate-600 mb-1 items-center"><span>Safe Withdrawal Rate (%) <svg class="w-3 h-3 inline-block ml-0.5 text-slate-300 hover:text-indigo-500 cursor-help" fill="none" stroke="currentColor" viewBox="0 0 24 24" onmouseenter="app.showHelp(this, 'swr')" onmouseleave="app.hideHelp()"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></span><input type="number" id="num-swr" class="editable-num text-emerald-600 text-right w-24" step="0.1"></div><input type="range" id="swr" min="2" max="6" step="0.1" class="w-full slider-ret"></div>
                     </div>
                 </div>
 
-                <!-- SECTION 3: SOCIAL SECURITY -->
+                <!-- SECTION 3 & 4 (SS & Events) -->
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5" data-help="social-security">
-                    <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 border-b pb-2">3. Social Security</h2>
+                    <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 border-b pb-2 flex items-center">3. Social Security <svg class="w-3 h-3 ml-1 text-slate-400 hover:text-indigo-600 cursor-help" fill="none" stroke="currentColor" viewBox="0 0 24 24" onmouseenter="app.showHelp(this, 'social-security')" onmouseleave="app.hideHelp()"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></h2>
                     <div class="space-y-5">
                         <div><div class="flex justify-between text-xs font-semibold text-slate-600 mb-1 items-center"><span>Payout Ratio (%)</span><input type="number" id="num-ssHaircut" class="editable-num text-amber-600 text-right w-24"></div><input type="range" id="ssHaircut" min="50" max="100" step="1" class="w-full slider-ss"></div>
                         <div class="bg-slate-50 p-3 rounded border border-slate-100"><p class="text-xs font-bold text-slate-700 mb-2">You</p><div class="grid grid-cols-2 gap-3"><div><label class="text-[10px] font-semibold text-slate-500 block">Claim Age</label><input type="number" id="num-ssAge" class="editable-num text-amber-600 w-full text-left bg-transparent"><input type="range" id="ssAge" min="62" max="70" class="w-full slider-ss mt-1"></div><div><label class="text-[10px] font-semibold text-slate-500 block">Monthly $</label><input type="number" id="num-ssAmount" class="editable-num text-amber-600 w-full text-left bg-transparent"><input type="range" id="ssAmount" min="0" max="5000" step="100" class="w-full slider-ss mt-1"></div></div></div>
@@ -148,11 +117,11 @@
                 </div>
 
                  <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5" data-help="events">
-                    <div class="flex justify-between items-center mb-4 border-b pb-2"><h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider">4. Significant Cashflows</h2><button onclick="app.toggleEventForm()" class="text-xs bg-indigo-50 text-indigo-600 px-2 py-1 rounded font-bold hover:bg-indigo-100 transition-colors">+ Add</button></div>
+                    <div class="flex justify-between items-center mb-4 border-b pb-2"><h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center">4. Significant Cashflows <svg class="w-3 h-3 ml-1 text-slate-400 hover:text-indigo-600 cursor-help" fill="none" stroke="currentColor" viewBox="0 0 24 24" onmouseenter="app.showHelp(this, 'events')" onmouseleave="app.hideHelp()"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></h2><button onclick="app.toggleEventForm()" class="text-xs bg-indigo-50 text-indigo-600 px-2 py-1 rounded font-bold hover:bg-indigo-100 transition-colors">+ Add</button></div>
                     <div id="event-form" class="hidden bg-slate-50 p-3 rounded border border-indigo-100 mb-3 space-y-3">
-                        <div class="space-y-1" data-help="event-desc"><label class="text-[10px] font-bold text-slate-500">Description</label><input type="text" id="evt-name" class="w-full text-xs border border-slate-200 rounded p-1" placeholder="e.g. College"></div>
-                        <div class="flex gap-2" data-help="event-timing"><div class="w-1/2 space-y-1"><label class="text-[10px] font-bold text-slate-500">Start Age</label><input type="number" id="evt-start" class="w-full text-xs border border-slate-200 rounded p-1"></div><div class="w-1/2 space-y-1"><label class="text-[10px] font-bold text-slate-500">End Age</label><input type="number" id="evt-end" class="w-full text-xs border border-slate-200 rounded p-1"></div></div>
-                        <div class="space-y-1" data-help="event-amount"><label class="text-[10px] font-bold text-slate-500">Annual Amount</label><input type="number" id="evt-amt" class="w-full text-xs border border-slate-200 rounded p-1" placeholder="Negative = Expense"></div>
+                        <div class="space-y-1" data-help="event-desc"><label class="text-[10px] font-bold text-slate-500">Description <svg class="w-3 h-3 inline-block ml-0.5 text-slate-300 hover:text-indigo-500 cursor-help" fill="none" stroke="currentColor" viewBox="0 0 24 24" onmouseenter="app.showHelp(this, 'event-desc')" onmouseleave="app.hideHelp()"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></label><input type="text" id="evt-name" class="w-full text-xs border border-slate-200 rounded p-1" placeholder="e.g. College"></div>
+                        <div class="flex gap-2" data-help="event-timing"><div class="w-1/2 space-y-1"><label class="text-[10px] font-bold text-slate-500">Start Age <svg class="w-3 h-3 inline-block ml-0.5 text-slate-300 hover:text-indigo-500 cursor-help" fill="none" stroke="currentColor" viewBox="0 0 24 24" onmouseenter="app.showHelp(this, 'event-timing')" onmouseleave="app.hideHelp()"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></label><input type="number" id="evt-start" class="w-full text-xs border border-slate-200 rounded p-1"></div><div class="w-1/2 space-y-1"><label class="text-[10px] font-bold text-slate-500">End Age</label><input type="number" id="evt-end" class="w-full text-xs border border-slate-200 rounded p-1"></div></div>
+                        <div class="space-y-1" data-help="event-amount"><label class="text-[10px] font-bold text-slate-500">Annual Amount <svg class="w-3 h-3 inline-block ml-0.5 text-slate-300 hover:text-indigo-500 cursor-help" fill="none" stroke="currentColor" viewBox="0 0 24 24" onmouseenter="app.showHelp(this, 'event-amount')" onmouseleave="app.hideHelp()"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></label><input type="number" id="evt-amt" class="w-full text-xs border border-slate-200 rounded p-1" placeholder="Negative = Expense"></div>
                         <div class="flex gap-2 pt-1"><button onclick="app.addEvent()" class="flex-1 bg-indigo-600 text-white text-xs py-1.5 rounded font-bold hover:bg-indigo-700">Save</button><button onclick="app.toggleEventForm()" class="flex-1 bg-white border border-slate-300 text-slate-600 text-xs py-1.5 rounded hover:bg-slate-50">Cancel</button></div>
                     </div>
                     <div id="event-list" class="space-y-2"><p class="text-xs text-slate-400 text-center py-2">No custom events added.</p></div>
@@ -163,9 +132,9 @@
             <div class="xl:col-span-8 space-y-6">
                 <!-- KPI Cards -->
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div class="bg-indigo-600 rounded-xl p-4 text-white shadow-lg relative overflow-hidden" data-help="kpi-coast"><div class="relative z-10"><p class="text-indigo-200 text-[10px] font-bold uppercase tracking-wider">Projected Coast Ready</p><h3 class="text-2xl font-bold mt-1" id="res-coastAge">--</h3><p class="text-indigo-200 text-xs mt-1" id="res-coastDetails">Calculating...</p></div></div>
-                    <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm" data-help="kpi-tipping"><p class="text-slate-500 text-[10px] font-bold uppercase tracking-wider">Tipping Point</p><h3 class="text-2xl font-bold text-slate-800 mt-1" id="res-tippingAge">--</h3><p class="text-slate-500 text-xs mt-1">Returns > Contributions</p></div>
-                    <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm" data-help="kpi-safe"><p class="text-slate-500 text-[10px] font-bold uppercase tracking-wider">Portfolio at Age 90</p><h3 class="text-2xl font-bold text-slate-800 mt-1" id="res-endPortfolio">--</h3><p class="text-slate-500 text-xs mt-1" id="res-endStatus">Safe?</p></div>
+                    <div class="bg-indigo-600 rounded-xl p-4 text-white shadow-lg relative overflow-hidden" data-help="kpi-coast"><div class="relative z-10"><p class="text-indigo-200 text-[10px] font-bold uppercase tracking-wider flex items-center">Projected Coast Ready <svg class="w-3 h-3 ml-1 text-indigo-300 hover:text-white cursor-help" fill="none" stroke="currentColor" viewBox="0 0 24 24" onmouseenter="app.showHelp(this, 'kpi-coast')" onmouseleave="app.hideHelp()"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></p><h3 class="text-2xl font-bold mt-1" id="res-coastAge">--</h3><p class="text-indigo-200 text-xs mt-1" id="res-coastDetails">Calculating...</p></div></div>
+                    <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm" data-help="kpi-tipping"><p class="text-slate-500 text-[10px] font-bold uppercase tracking-wider flex items-center">Tipping Point <svg class="w-3 h-3 ml-1 text-slate-300 hover:text-indigo-500 cursor-help" fill="none" stroke="currentColor" viewBox="0 0 24 24" onmouseenter="app.showHelp(this, 'kpi-tipping')" onmouseleave="app.hideHelp()"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></p><h3 class="text-2xl font-bold text-slate-800 mt-1" id="res-tippingAge">--</h3><p class="text-slate-500 text-xs mt-1">Returns > Contributions</p></div>
+                    <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm" data-help="kpi-safe"><p class="text-slate-500 text-[10px] font-bold uppercase tracking-wider flex items-center">Portfolio at Age 90 <svg class="w-3 h-3 ml-1 text-slate-300 hover:text-indigo-500 cursor-help" fill="none" stroke="currentColor" viewBox="0 0 24 24" onmouseenter="app.showHelp(this, 'kpi-safe')" onmouseleave="app.hideHelp()"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></p><h3 class="text-2xl font-bold text-slate-800 mt-1" id="res-endPortfolio">--</h3><p class="text-slate-500 text-xs mt-1" id="res-endStatus">Safe?</p></div>
                 </div>
 
                 <!-- Main Chart -->
@@ -173,6 +142,7 @@
                     <div class="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
                         <div class="flex items-center gap-4"><h3 class="text-lg font-bold text-slate-800" id="chart-title">Portfolio Balance</h3><div class="hidden sm:block text-xs bg-emerald-50 text-emerald-700 px-2 py-1 rounded border border-emerald-100" id="fi-number-display">FI Target: --</div></div>
                         <div class="bg-slate-100 p-1 rounded-lg flex text-xs font-medium" data-help="chart-toggles">
+                            <div class="relative inline-block mr-2 self-center"><svg class="w-3 h-3 text-slate-400 hover:text-indigo-600 cursor-help" fill="none" stroke="currentColor" viewBox="0 0 24 24" onmouseenter="app.showHelp(this, 'chart-toggles')" onmouseleave="app.hideHelp()"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div>
                             <button onclick="setMode('balance')" id="btn-balance" class="px-3 py-1.5 rounded shadow-sm bg-white text-indigo-600 transition-all">Net Worth</button>
                             <button onclick="setMode('income')" id="btn-income" class="px-3 py-1.5 rounded text-slate-500 hover:text-slate-700 transition-all">Cashflow</button>
                             <button onclick="setMode('monteCarlo')" id="btn-monteCarlo" class="px-3 py-1.5 rounded text-slate-500 hover:text-slate-700 hover:bg-purple-50 hover:text-purple-600 transition-all flex items-center gap-1">Monte Carlo</button>
@@ -190,7 +160,7 @@
                             <div class="text-[10px] text-slate-400 uppercase font-bold">Calculation Details</div>
                             <div class="flex gap-2"><button onclick="app.exportTableCsv()" class="text-[10px] uppercase font-bold text-slate-500 hover:text-indigo-600">CSV</button><button onclick="app.exportTableJson()" class="text-[10px] uppercase font-bold text-slate-500 hover:text-indigo-600">JSON</button></div>
                         </div>
-                        <div class="overflow-x-auto max-h-80 scrolly-table"><table class="min-w-full text-xs text-left text-slate-600"><thead class="text-[10px] text-slate-500 uppercase bg-slate-100 sticky top-0"><tr><th class="px-4 py-2" data-help="audit-column">Audit</th><th class="px-4 py-2">Age</th><th class="px-4 py-2">Year</th><th class="px-4 py-2">Phase</th><th class="px-4 py-2">Start Bal</th><th class="px-4 py-2 text-right">Net Flow</th><th class="px-4 py-2 text-right">Tax Paid</th><th class="px-4 py-2 text-right">Growth</th><th class="px-4 py-2 text-right">End Bal</th></tr></thead><tbody id="table-body" class="divide-y divide-slate-100"></tbody></table></div>
+                        <div class="overflow-x-auto max-h-80 scrolly-table"><table class="min-w-full text-xs text-left text-slate-600"><thead class="text-[10px] text-slate-500 uppercase bg-slate-100 sticky top-0"><tr><th class="px-4 py-2 flex items-center gap-1">Audit <svg class="w-3 h-3 text-slate-300 hover:text-indigo-500 cursor-help" fill="none" stroke="currentColor" viewBox="0 0 24 24" onmouseenter="app.showHelp(this, 'audit-column')" onmouseleave="app.hideHelp()"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></th><th class="px-4 py-2">Age</th><th class="px-4 py-2">Year</th><th class="px-4 py-2">Phase</th><th class="px-4 py-2">Start Bal</th><th class="px-4 py-2 text-right">Net Flow</th><th class="px-4 py-2 text-right">Tax Paid</th><th class="px-4 py-2 text-right">Growth</th><th class="px-4 py-2 text-right">End Bal</th></tr></thead><tbody id="table-body" class="divide-y divide-slate-100"></tbody></table></div>
                     </div>
                 </div>
 
@@ -209,16 +179,40 @@
         <div class="absolute inset-y-0 right-0 max-w-sm w-full flex"><div class="relative w-full h-full bg-white shadow-2xl flex flex-col transform transition-transform"><div class="bg-indigo-600 px-4 py-4 flex justify-between items-center text-white"><div><h2 class="text-lg font-bold">AI Copilot</h2><p class="text-[10px] text-indigo-200">Describe your scenario in plain English.</p></div><button onclick="app.toggleCopilot()" class="text-indigo-200 hover:text-white"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button></div><div class="bg-slate-50 p-4 border-b border-slate-200" id="api-config"><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">OpenAI Compatible API Key</label><div class="flex gap-2"><input type="password" id="api-key" class="flex-1 bg-white border border-slate-300 rounded text-xs px-2 py-1.5 focus:outline-none focus:border-indigo-500" placeholder="sk-..."><button onclick="app.saveKey()" class="bg-white border border-slate-300 text-slate-600 text-xs px-3 rounded hover:bg-slate-100">Save</button></div><p class="text-[9px] text-slate-400 mt-1">Stored locally in your browser. Not sent to any server other than OpenAI.</p></div><div class="flex-1 overflow-y-auto p-4 flex flex-col space-y-4 bg-slate-50" id="chat-history"><div class="chat-system">Copilot Ready. Try: "I want to retire at 50 with 2M" or "Add a wedding expense of 30k at age 32"</div></div><div class="p-4 bg-white border-t border-slate-200"><div class="relative"><textarea id="chat-input" rows="2" class="w-full bg-slate-50 border border-slate-300 rounded-lg pl-3 pr-10 py-2 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 resize-none" placeholder="Type your plan..."></textarea><button onclick="app.sendChat()" class="absolute right-2 bottom-2 text-indigo-500 hover:text-indigo-700"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg></button></div></div></div></div>
     </div>
     
-    <div id="test-modal" class="hidden fixed inset-0 z-[250] overflow-y-auto">
-        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:p-0">
-            <div class="fixed inset-0 modal-backdrop" onclick="tests.close()"></div>
-            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-xl sm:w-full">
-                <div class="bg-white px-4 pt-5 pb-4 sm:p-6">
-                    <div class="flex justify-between items-start border-b pb-2 mb-4">
-                        <h3 class="text-lg leading-6 font-bold text-gray-900">Unit Test Suite</h3>
-                        <button onclick="tests.close()" class="text-gray-400 hover:text-gray-500">X</button>
+    <!-- Test Runner IDE -->
+    <div id="test-modal" class="hidden fixed inset-0 z-[250] overflow-hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="absolute inset-0 bg-slate-900/50 transition-opacity backdrop-blur-sm" onclick="tests.close()"></div>
+        <div class="absolute inset-0 flex items-center justify-center p-4">
+            <div class="bg-white rounded-xl shadow-2xl w-full max-w-4xl h-[80vh] flex overflow-hidden">
+                <!-- Sidebar -->
+                <div class="w-48 bg-slate-50 border-r border-slate-200 p-4 flex flex-col">
+                    <h3 class="text-xs font-bold text-slate-400 uppercase mb-4">Test Suite</h3>
+                    <nav class="flex-1 space-y-1">
+                        <button onclick="tests.filter('all')" id="tab-all" class="w-full text-left text-xs font-medium px-3 py-2 rounded bg-indigo-50 text-indigo-700 border-l-4 border-indigo-600">All Tests</button>
+                        <button onclick="tests.filter('growth')" id="tab-growth" class="w-full text-left text-xs font-medium px-3 py-2 rounded text-slate-600 hover:bg-slate-100">Growth Logic</button>
+                        <button onclick="tests.filter('tax')" id="tab-tax" class="w-full text-left text-xs font-medium px-3 py-2 rounded text-slate-600 hover:bg-slate-100">Tax Waterfall</button>
+                        <button onclick="tests.filter('events')" id="tab-events" class="w-full text-left text-xs font-medium px-3 py-2 rounded text-slate-600 hover:bg-slate-100">Cashflow Events</button>
+                        <button onclick="tests.filter('coast')" id="tab-coast" class="w-full text-left text-xs font-medium px-3 py-2 rounded text-slate-600 hover:bg-slate-100">Coast & SS</button>
+                    </nav>
+                </div>
+                <!-- Main Content -->
+                <div class="flex-1 flex flex-col">
+                    <div class="border-b border-slate-200 p-4 flex justify-between items-center bg-white">
+                        <div>
+                            <h2 class="text-lg font-bold text-slate-800">Unit Tests</h2>
+                            <p class="text-xs text-slate-500" id="test-status">Ready to run.</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="tests.runAll()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-1.5 rounded font-bold flex items-center gap-1">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                Run All
+                            </button>
+                            <button onclick="tests.close()" class="text-slate-400 hover:text-slate-600"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                        </div>
                     </div>
-                    <div id="test-results" class="text-xs font-mono text-slate-600 space-y-2 max-h-[60vh] overflow-y-auto"></div>
+                    <div class="flex-1 overflow-y-auto p-4 bg-slate-50 space-y-3" id="test-results">
+                        <!-- Results injected here -->
+                    </div>
                 </div>
             </div>
         </div>
@@ -233,47 +227,23 @@
         // --- 1. CORE MATH ENGINE (Pure Logic) ---
         class RetirementEngine {
             constructor() {}
-
-            static randn_bm() {
-                let u=0,v=0; while(u===0)u=Math.random(); while(v===0)v=Math.random();
-                return Math.sqrt(-2.0*Math.log(u))*Math.cos(2.0*Math.PI*v);
-            }
-
-            // The main simulation function - now pure
+            static randn_bm() { let u=0,v=0; while(u===0)u=Math.random(); while(v===0)v=Math.random(); return Math.sqrt(-2.0*Math.log(u))*Math.cos(2.0*Math.PI*v); }
             static simulateTrajectory(p, events, useRandom = false, forceCoastFromAge = null) {
-                // Derived Params
                 const effectiveStopContrib = forceCoastFromAge !== null ? forceCoastFromAge : Math.min(p.stopContribAge, p.retireAge);
                 const spouseAgeDiff = p.ssSpouseCurrentAge - p.age;
-                
-                // Initial State
                 let portTaxable = p.savingsTaxable, portDeferred = p.savingsDeferred, portFree = p.savingsFree;
                 let cTax = p.contribTaxable, cDef = p.contribDeferred, cFree = p.contribFree;
                 let expenses = p.expenses, age = p.age, year = new Date().getFullYear();
-                
                 const maxYears = 95 - p.age;
                 let trajectory = [];
                 let tippingAge = null;
-
-                // Rates
-                const rAcc = p.return / 100;
-                const rRet = p.retireReturn / 100;
-                const vol = p.volatility / 100;
-                const inf = p.inflation / 100;
-                const haircut = p.ssHaircut / 100;
-                const taxInc = p.taxRateIncome / 100;
-                const taxCap = p.taxRateCap / 100;
+                const rAcc=p.return/100, rRet=p.retireReturn/100, vol=p.volatility/100, inf=p.inflation/100, haircut=p.ssHaircut/100, taxInc=p.taxRateIncome/100, taxCap=p.taxRateCap/100;
 
                 for (let i = 0; i <= maxYears; i++) {
-                    // Snapshot Start
-                    const startTaxable = portTaxable, startDeferred = portDeferred, startFree = portFree;
-                    
-                    // Flags
+                    const startTaxable=portTaxable, startDeferred=portDeferred, startFree=portFree;
                     const currentSpouseAge = age + spouseAgeDiff;
-                    const isRetired = age >= p.retireAge;
-                    const isContributing = age < effectiveStopContrib;
-                    const isCoasting = !isRetired && !isContributing;
-
-                    // 1. Growth
+                    const isRetired = age >= p.retireAge, isContributing = age < effectiveStopContrib, isCoasting = !isRetired && !isContributing;
+                    
                     let rCurrent = isRetired ? rRet : rAcc;
                     if (useRandom) rCurrent += (vol * this.randn_bm());
                     
@@ -284,203 +254,187 @@
                     portTaxable += growthTaxable; portDeferred += growthDeferred; portFree += growthFree;
                     const totalGrowth = growthTaxable + growthDeferred + growthFree;
 
-                    // 2. Social Security & Events
-                    const yearsOfInf = year - new Date().getFullYear(); // Assuming start year is current
-                    // Note: In tests, year logic might need base year. For now assuming current year start.
-                    const inflationFactor = Math.pow(1 + inf, i); // Use loop index for robust rel calc
-
+                    const yearsOfInf = year - new Date().getFullYear();
+                    const inflationFactor = Math.pow(1+inf, yearsOfInf);
                     let userSS=0, spouseSS=0;
-                    if (age >= p.ssAge) userSS = (p.ssAmount * 12) * inflationFactor;
-                    if (currentSpouseAge >= p.ssSpouseAge) spouseSS = (p.ssSpouseAmount * 12) * inflationFactor;
-                    const ssTotal = (userSS + spouseSS) * haircut;
+                    if (age >= p.ssAge) userSS = (p.ssAmount*12)*inflationFactor;
+                    if (currentSpouseAge >= p.ssSpouseAge) spouseSS = (p.ssSpouseAmount*12)*inflationFactor;
+                    const ssTotal = (userSS+spouseSS)*haircut;
 
-                    let eventsSum = 0;
-                    let eventDetails = [];
-                    events.forEach(e => {
-                        if (age >= e.start && age <= e.end) {
-                            const val = e.amt * inflationFactor;
-                            eventsSum += val;
-                            eventDetails.push(`${e.name}: ${val.toFixed(0)}`);
-                        }
-                    });
+                    let eventsSum=0, eventDetails=[];
+                    events.forEach(e => { if(age>=e.start && age<=e.end) { const v=e.amt*inflationFactor; eventsSum+=v; eventDetails.push(`${e.name}: ${v.toFixed(0)}`); } });
 
-                    // 3. Flows
-                    let totalTaxPaid=0, netFlowDisplay=0, flow=0;
-                    let withdrawTaxable=0, withdrawDeferred=0, withdrawFree=0;
-                    
-                    // Effective Expenses (Late Life Adjustment)
+                    let totalTaxPaid=0, netFlowDisplay=0, flow=0, withdrawTaxable=0, withdrawDeferred=0, withdrawFree=0;
                     let effectiveExpenses = expenses;
-                    if (age >= p.lateSpendAge) {
-                        effectiveExpenses = expenses * (p.lateSpendLevel / 100);
-                    }
+                    if (age >= p.lateSpendAge) { effectiveExpenses = expenses * (p.lateSpendLevel / 100); }
 
                     if (!isRetired) {
-                        // Accumulation Phase
                         if (isContributing) {
-                            portTaxable += cTax; portDeferred += cDef; portFree += cFree;
-                            let annualContrib = cTax + cDef + cFree;
-                            flow += annualContrib;
-                            if (!tippingAge && totalGrowth > annualContrib) tippingAge = age;
+                            portTaxable+=cTax; portDeferred+=cDef; portFree+=cFree;
+                            let annualContrib = cTax+cDef+cFree; flow+=annualContrib;
+                            if (!tippingAge && totalGrowth>annualContrib) tippingAge=age;
                         }
-                        
-                        // Extra income/expenses flow to taxable
-                        const extraCash = ssTotal + eventsSum;
-                        portTaxable += extraCash; 
-                        flow += extraCash;
-                        netFlowDisplay = flow;
-
-                        if (isContributing) { 
-                            cTax *= (1 + inf); cDef *= (1 + inf); cFree *= (1 + inf); 
-                        }
+                        const extraCash = ssTotal + eventsSum; portTaxable+=extraCash; flow+=extraCash; netFlowDisplay=flow;
+                        if (isContributing) { cTax*=(1+inf); cDef*=(1+inf); cFree*=(1+inf); }
                     } else {
-                        // Decumulation Phase
                         let gap = effectiveExpenses - (ssTotal + eventsSum);
-                        
-                        if (gap < 0) {
-                            // Surplus
-                            portTaxable += Math.abs(gap);
-                            flow += Math.abs(gap);
-                        } else {
-                            // Deficit - Withdraw
+                        if (gap < 0) { portTaxable+=Math.abs(gap); flow+=Math.abs(gap); } 
+                        else {
                             let remainingNeed = gap;
-                            
-                            // Waterfall: Taxable -> Deferred -> Free
                             if (remainingNeed > 0 && portTaxable > 0) {
-                                const effRate = 0.5 * taxCap;
-                                const grossNeeded = remainingNeed / (1 - effRate);
-                                const withdraw = Math.min(portTaxable, grossNeeded);
-                                const tax = withdraw * effRate;
-                                
-                                withdrawTaxable = withdraw;
-                                portTaxable -= withdraw;
-                                remainingNeed -= (withdraw - tax);
-                                totalTaxPaid += tax;
-                                flow -= withdraw;
+                                const effRate = 0.5 * taxCap; const gross = remainingNeed/(1-effRate); const w = Math.min(portTaxable, gross); const t=w*effRate;
+                                withdrawTaxable=w; portTaxable-=w; remainingNeed-=(w-t); totalTaxPaid+=t; flow-=w;
                             }
                             if (remainingNeed > 0 && portDeferred > 0) {
-                                const gross = remainingNeed / (1 - taxInc);
-                                const withdraw = Math.min(portDeferred, gross);
-                                const tax = withdraw * taxInc;
-                                
-                                withdrawDeferred = withdraw;
-                                portDeferred -= withdraw;
-                                remainingNeed -= (withdraw - tax);
-                                totalTaxPaid += tax;
-                                flow -= withdraw;
+                                const gross = remainingNeed/(1-taxInc); const w = Math.min(portDeferred, gross); const t=w*taxInc;
+                                withdrawDeferred=w; portDeferred-=w; remainingNeed-=(w-t); totalTaxPaid+=t; flow-=w;
                             }
                             if (remainingNeed > 0 && portFree > 0) {
-                                const withdraw = Math.min(portFree, remainingNeed);
-                                withdrawFree = withdraw;
-                                portFree -= withdraw;
-                                remainingNeed -= withdraw;
-                                flow -= withdraw;
+                                const w = Math.min(portFree, remainingNeed);
+                                withdrawFree=w; portFree-=w; remainingNeed-=w; flow-=w;
                             }
                         }
                         netFlowDisplay = flow;
                     }
-
-                    let totalPort = Math.max(0, portTaxable + portDeferred + portFree);
-                    
-                    trajectory.push({
-                        age, year: year + i, // Simple increment
-                        startTaxable, startDeferred, startFree,
-                        endTaxable: portTaxable, endDeferred: portDeferred, endFree: portFree,
-                        growthTaxable, growthDeferred, growthFree, rCurrent,
-                        isRetired, isCoasting, expenses: effectiveExpenses, ssTotal, eventsSum, eventDetails,
-                        drawdown: netFlowDisplay, totalTaxPaid,
-                        withdrawTaxable, withdrawDeferred, withdrawFree, inflationFactor,
-                        startPort: startTaxable + startDeferred + startFree,
-                        portfolio: totalPort,
-                        growth: totalGrowth
-                    });
-
-                    // Inflate baseline expenses for next year
-                    expenses *= (1 + inf);
-                    age++;
+                    let totalPort = Math.max(0, portTaxable+portDeferred+portFree);
+                    trajectory.push({ age, year: year+i, startTaxable, startDeferred, startFree, endTaxable:portTaxable, endDeferred:portDeferred, endFree:portFree, growthTaxable:startTaxable*rCurrent, growthDeferred:startDeferred*rCurrent, growthFree:startFree*rCurrent, rCurrent, isRetired, isCoasting, expenses: effectiveExpenses, ssTotal, eventsSum, eventDetails, drawdown:netFlowDisplay, totalTaxPaid, withdrawTaxable, withdrawDeferred, withdrawFree, inflationFactor, startPort:startTaxable+startDeferred+startFree, portfolio:totalPort, growth:totalGrowth });
+                    expenses*=(1+inf); age++; year++;
                 }
-
                 return { trajectory, tippingAge };
             }
         }
 
-        // --- 2. TEST SUITE ---
+        // --- 2. INITIAL DEFAULTS ---
+        const defaults = {
+            age: 35, retireAge: 60, stopContribAge: 55, savingsTaxable: 20000, savingsDeferred: 60000, savingsFree: 20000,
+            contribTaxable: 5000, contribDeferred: 15000, contribFree: 5000, return: 8.0, retireReturn: 5.0, volatility: 12.0, inflation: 3.0,
+            expenses: 60000, taxRateIncome: 20, taxRateCap: 15, swr: 4.0, ssHaircut: 100, ssAge: 67, ssAmount: 2500, ssSpouseCurrentAge: 35, ssSpouseAge: 67, ssSpouseAmount: 0, lateSpendAge: 80, lateSpendLevel: 100
+        };
+        const inputs = {}; 
+
+        // --- 3. EXPANDED TEST SUITE ---
         const tests = {
-            run: () => {
-                const results = [];
-                const addResult = (name, pass, msg) => results.push({name, pass, msg});
-                
-                try {
-                    // Test 1: Simple Growth
-                    // $100k, 10% return, 0 contribs. Year 1 should be $110k.
-                    const p1 = { ...defaults, savingsTaxable: 100000, savingsDeferred:0, savingsFree:0, return: 10, inflation: 0, stopContribAge: 35, age: 35, retireAge: 60 };
-                    const r1 = RetirementEngine.simulateTrajectory(p1, []);
-                    const y1Bal = r1.trajectory[0].portfolio;
-                    addResult("Basic Growth (10%)", Math.abs(y1Bal - 110000) < 1, `Expected 110000, got ${y1Bal.toFixed(2)}`);
+            currentFilter: 'all',
+            definitions: [
+                // 1. GROWTH & BASICS
+                { category: 'growth', name: 'Simple Compound Growth', desc: 'Checks if $100k grows to $110k in one year with 10% return and 0 inflation.', inputs: { ...defaults, savingsTaxable: 100000, savingsDeferred:0, savingsFree:0, return: 10, inflation: 0, stopContribAge: 35, age: 35, retireAge: 60, contribTaxable:0, contribDeferred:0, contribFree:0 }, check: (r) => { const y1=r.trajectory[0].portfolio; return { pass: Math.abs(y1 - 110000) < 1, msg: `Start: 100k\nReturn: 10%\nExp: 110000\nAct: ${y1.toFixed(0)}` }; } },
+                { category: 'growth', name: 'Inflation Indexing (Expense)', desc: 'Expenses should inflate by 10% in Year 2.', inputs: { ...defaults, age: 60, retireAge: 60, expenses: 100000, inflation: 10, return:0, savingsTaxable:1000000 }, check: (r) => { const y2=r.trajectory[1].expenses; return { pass: Math.abs(y2 - 110000) < 1, msg: `Year 1 Exp: 100k\nInf: 10%\nExp: 110000\nAct: ${y2.toFixed(0)}` }; } },
+                { category: 'growth', name: 'Inflation Indexing (Contrib)', desc: 'Contribs should inflate by 5%.', inputs: { ...defaults, age: 35, stopContribAge: 40, retireAge: 60, contribTaxable: 10000, contribDeferred:0, contribFree:0, inflation: 5, return:0 }, check: (r) => { const y2=r.trajectory[1].drawdown; return { pass: Math.abs(y2 - 10500) < 1, msg: `Year 1 Contrib: 10000\nInf: 5%\nExp: 10500\nAct: ${y2.toFixed(0)}` }; } },
+                { category: 'growth', name: 'Negative Returns', desc: '-20% Market Drop simulation.', inputs: { ...defaults, savingsTaxable: 100000, savingsDeferred:0, savingsFree:0, return: -20, inflation: 0, stopContribAge: 35, contribTaxable:0, contribDeferred:0, contribFree:0 }, check: (r) => { const y1=r.trajectory[0].portfolio; return { pass: Math.abs(y1 - 80000) < 1, msg: `Start: 100k\nReturn: -20%\nExp: 80000\nAct: ${y1.toFixed(0)}` }; } },
 
-                    // Test 2: Tax Logic
-                    // Retire immediately. Need $10k net. 100k in Taxable. 20% Cap Gains.
-                    // Assumption in code: 50% of withdraw is gains -> Eff Rate = 10%.
-                    // Gross = 10000 / (1 - 0.10) = 11111.11. Tax = 1111.11.
-                    const p2 = { ...defaults, age: 60, retireAge: 60, expenses: 10000, savingsTaxable: 100000, savingsDeferred:0, savingsFree:0, taxRateCap: 20, return: 0, inflation: 0, ssAmount: 0, ssSpouseAmount: 0 };
-                    const r2 = RetirementEngine.simulateTrajectory(p2, []);
-                    const d2 = r2.trajectory[0];
-                    const expectedTax = 1111.11;
-                    addResult("Taxable Withdrawal Math", Math.abs(d2.totalTaxPaid - expectedTax) < 1, `Expected tax ~1111.11, got ${d2.totalTaxPaid.toFixed(2)}`);
+                // 2. TAX LOGIC
+                { category: 'tax', name: 'Taxable Gross-Up (Cap Gains)', desc: 'Withdraw 10k Net. 20% Cap Rate. 50% Basis. Eff Rate 10%. Gross should be 11,111.', inputs: { ...defaults, age: 60, retireAge: 60, expenses: 10000, savingsTaxable: 100000, savingsDeferred:0, savingsFree:0, taxRateCap: 20, return: 0, inflation: 0, ssAmount: 0, ssSpouseAmount: 0 }, check: (r) => { const t=r.trajectory[0].totalTaxPaid; return { pass: Math.abs(t - 1111.11) < 1, msg: `Net Needed: 10k\nEff Tax: 10%\nGross Needed: ~11,111\nExp Tax: ~1,111\nAct Tax: ${t.toFixed(2)}` }; } },
+                { category: 'tax', name: 'Deferred Gross-Up (Income)', desc: 'Withdraw 10k Net. 20% Income Rate. Gross should be 12,500.', inputs: { ...defaults, age: 60, retireAge: 60, expenses: 10000, savingsTaxable: 0, savingsDeferred:100000, savingsFree:0, taxRateIncome: 20, return: 0, inflation: 0, ssAmount: 0, ssSpouseAmount: 0 }, check: (r) => { const t=r.trajectory[0].totalTaxPaid; return { pass: Math.abs(t - 2500) < 1, msg: `Net Needed: 10k\nTax Rate: 20%\nGross Needed: 12,500\nExp Tax: 2,500\nAct Tax: ${t.toFixed(2)}` }; } },
+                { category: 'tax', name: 'Tax-Free Withdrawal', desc: 'Withdraw 10k Net from Roth. Tax should be 0.', inputs: { ...defaults, age: 60, retireAge: 60, expenses: 10000, savingsTaxable: 0, savingsDeferred:0, savingsFree:100000, return: 0, inflation: 0, ssAmount: 0, ssSpouseAmount: 0 }, check: (r) => { const t=r.trajectory[0].totalTaxPaid; return { pass: t === 0, msg: `Bucket: Tax Free\nExp Tax: 0\nAct Tax: ${t}` }; } },
+                { category: 'tax', name: 'Bucket Spillover', desc: 'Expenses exceed Taxable balance. Should flow to Deferred.', inputs: { ...defaults, age: 60, retireAge: 60, expenses: 20000, savingsTaxable: 10000, savingsDeferred: 100000, savingsFree:0, taxRateCap:0, taxRateIncome:0, return:0, inflation:0, ssAmount:0 }, check: (r) => { const d=r.trajectory[0]; return { pass: d.endTaxable===0 && d.endDeferred < 100000, msg: `Start Taxable: 10k\nNeed: 20k\nExp End Taxable: 0\nAct End Taxable: ${d.endTaxable}\nAct End Deferred: ${d.endDeferred}` }; } },
 
-                    // Test 3: Event Injection
-                    // Add 50k at age 40.
-                    const p3 = { ...defaults, age: 39, retireAge: 60, savingsTaxable: 0, savingsDeferred:0, savingsFree:0, return: 0, inflation: 0, contribTaxable:0, contribDeferred:0, contribFree:0 };
-                    const ev3 = [{id:1, name:'Windfall', start:40, end:40, amt:50000}];
-                    const r3 = RetirementEngine.simulateTrajectory(p3, ev3);
-                    // Age 39 (index 0): 0. Age 40 (index 1): +50k.
-                    addResult("Event Cashflow", Math.abs(r3.trajectory[1].drawdown - 50000) < 1, `Expected 50k inflow at age 40, got ${r3.trajectory[1].drawdown}`);
+                // 3. CASHFLOW & EVENTS
+                { category: 'events', name: 'One-Time Expense', desc: 'Simulate 50k wedding cost at age 40.', inputs: { ...defaults, age: 39, retireAge: 60, savingsTaxable: 100000, savingsDeferred:0, savingsFree:0, return: 0, inflation: 0, contribTaxable:0, contribDeferred:0, contribFree:0 }, events: [{id:1, name:'Wed', start:40, end:40, amt:-50000}], check: (r) => { const bal=r.trajectory[1].portfolio; return { pass: Math.abs(bal - 50000) < 1, msg: `Start: 100k\nEvent: -50k\nExp: 50k\nAct: ${bal.toFixed(0)}` }; } },
+                { category: 'events', name: 'Pre-Retirement Income', desc: 'Side hustle income 10k/yr.', inputs: { ...defaults, age: 35, retireAge: 60, contribTaxable:0, contribDeferred:0, contribFree:0, inflation:0 }, events: [{id:1, name:'Gig', start:35, end:35, amt:10000}], check: (r) => { const flow=r.trajectory[0].drawdown; return { pass: flow === 10000, msg: `Event: +10k\nExp Flow: 10000\nAct Flow: ${flow}` }; } },
 
-                    // Test 4: Coast Logic
-                    // Stop contrib at 40. Retire 60. 
-                    const p4 = { ...defaults, age:35, stopContribAge: 40, retireAge: 60, contribTaxable: 10000, contribDeferred:0, contribFree:0, inflation:0 };
-                    const r4 = RetirementEngine.simulateTrajectory(p4, []);
-                    // Check if contribs stop at age 40 (index 5)
-                    const idx40 = 5;
-                    addResult("Coast Stop Contrib", r4.trajectory[idx40].contribution === undefined && r4.trajectory[idx40].drawdown === 0, "Contributions should be 0 after stop age");
-
-                    // Test 5: Late Spending
-                    // Expenses 100k. Late Age 80. Level 80%.
-                    // At age 80, effective expense should be 80k (assuming 0 inflation for simplicity test).
-                    const p5 = { ...defaults, age: 79, retireAge: 60, expenses: 100000, inflation: 0, lateSpendAge: 80, lateSpendLevel: 80, ssAmount: 0, ssSpouseAmount: 0 };
-                    const r5 = RetirementEngine.simulateTrajectory(p5, []);
-                    // Index 0 (Age 79): Exp 100k. Index 1 (Age 80): Exp 80k.
-                    addResult("Late Spending Adj", r5.trajectory[1].expenses === 80000, `Expected 80k exp at age 80, got ${r5.trajectory[1].expenses}`);
-
-                } catch(e) {
-                    addResult("Test Runner Error", false, e.message);
-                }
-
-                tests.showUI(results);
+                // 4. COAST & SS
+                { category: 'coast', name: 'Stop Contributions', desc: 'Contribs should be 0 after Stop Age.', inputs: { ...defaults, age:35, stopContribAge: 36, retireAge: 60, contribTaxable: 10000, contribDeferred:0, contribFree:0, inflation:0 }, check: (r) => { const y2=r.trajectory[1].drawdown; return { pass: y2 === 0, msg: `Stop Age: 36\nYear 2 Age: 36\nExp Flow: 0\nAct Flow: ${y2}` }; } },
+                { category: 'coast', name: 'Late Spending Drop', desc: 'Expenses drop at age 80.', inputs: { ...defaults, age: 79, retireAge: 60, expenses: 100000, inflation: 0, lateSpendAge: 80, lateSpendLevel: 80, ssAmount: 0, ssSpouseAmount: 0, return:0, savingsTaxable:1000000 }, check: (r) => { const e1=r.trajectory[0].expenses; const e2=r.trajectory[1].expenses; return { pass: e1===100000 && e2===80000, msg: `Age 79 Exp: 100k\nAdj Age: 80\nLevel: 80%\nExp Age 80: 80k\nAct Age 80: ${e2}` }; } },
+                { category: 'coast', name: 'Social Security Lag', desc: 'Spouse is younger. Check spouse benefit start delay.', inputs: { ...defaults, age: 65, retireAge: 65, ssAge: 65, ssAmount: 1000, ssSpouseCurrentAge: 60, ssSpouseAge: 65, ssSpouseAmount: 1000, ssHaircut:100, inflation:0, return:0, expenses:0 }, check: (r) => { 
+                    const y1=r.trajectory[0].ssTotal; 
+                    const y6=r.trajectory[5].ssTotal; 
+                    return { pass: y1===12000 && y6===24000, msg: `User Age: 65 (Claim 65)\nSpouse Age: 60 (Claim 65)\nYear 1 SS (Only User): 12k -> Act: ${y1}\nYear 6 SS (Both): 24k -> Act: ${y6}` }; 
+                }}
+            ],
+            
+            open: () => {
+                document.getElementById('test-modal').classList.remove('hidden');
+                tests.renderUI();
+            },
+            close: () => document.getElementById('test-modal').classList.add('hidden'),
+            
+            filter: (cat) => {
+                tests.currentFilter = cat;
+                ['all','growth','tax','events','coast'].forEach(c => {
+                    const el = document.getElementById(`tab-${c}`);
+                    if(c === cat) el.className = "w-full text-left text-xs font-bold px-3 py-2 rounded bg-indigo-50 text-indigo-700 border-l-4 border-indigo-600";
+                    else el.className = "w-full text-left text-xs font-medium px-3 py-2 rounded text-slate-600 hover:bg-slate-100";
+                });
+                tests.renderUI();
+            },
+            
+            runAll: () => {
+                const list = tests.currentFilter === 'all' ? tests.definitions : tests.definitions.filter(d => d.category === tests.currentFilter);
+                const results = list.map(def => tests.exec(def));
+                tests.renderResults(results);
+            },
+            
+            runSingle: (idx) => {
+                const def = tests.definitions[idx];
+                const res = tests.exec(def);
+                tests.renderResults([res]); // Just rendering this one result for simplicity in this view
             },
 
-            showUI: (results) => {
-                const modal = document.getElementById('test-modal');
-                const content = document.getElementById('test-results');
-                modal.classList.remove('hidden');
+            exec: (def) => {
+                try {
+                    const evts = def.events || [];
+                    const res = RetirementEngine.simulateTrajectory(def.inputs, evts);
+                    const check = def.check(res);
+                    return { ...def, pass: check.pass, resultMsg: check.msg, inputs: def.inputs };
+                } catch(e) {
+                    return { ...def, pass: false, resultMsg: `Error: ${e.message}`, inputs: def.inputs };
+                }
+            },
+
+            renderUI: () => {
+                const container = document.getElementById('test-results');
+                const list = tests.currentFilter === 'all' ? tests.definitions : tests.definitions.filter(d => d.category === tests.currentFilter);
                 
-                content.innerHTML = results.map(r => `
-                    <div class="flex justify-between items-center border-b border-slate-100 pb-1">
-                        <span class="font-bold ${r.pass ? 'text-emerald-600' : 'text-red-500'}">${r.pass ? 'PASS' : 'FAIL'}</span>
-                        <span class="flex-1 ml-3">${r.name}</span>
-                        ${!r.pass ? `<span class="text-xs text-red-400">${r.msg}</span>` : ''}
+                if(list.length === 0) { container.innerHTML = '<div class="text-center text-slate-400 py-10">No tests in this category.</div>'; return; }
+
+                container.innerHTML = list.map((d, i) => {
+                    // Find correct index in master array
+                    const globalIdx = tests.definitions.indexOf(d);
+                    return `
+                    <div class="bg-white border border-slate-200 rounded p-3 mb-2 shadow-sm hover:shadow transition-shadow flex justify-between items-center">
+                        <div>
+                            <h4 class="font-bold text-sm text-slate-700">${d.name}</h4>
+                            <p class="text-xs text-slate-500 mt-0.5">${d.desc}</p>
+                        </div>
+                        <button onclick="tests.runSingle(${globalIdx})" class="text-[10px] font-bold bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 py-1.5 rounded transition-colors">Run</button>
+                    </div>`;
+                }).join('');
+                
+                document.getElementById('test-status').innerText = `${list.length} tests ready.`;
+            },
+
+            renderResults: (results) => {
+                const container = document.getElementById('test-results');
+                container.innerHTML = results.map(r => `
+                    <div class="bg-white rounded p-4 mb-3 border-l-4 ${r.pass ? 'border-emerald-500' : 'border-red-500'} shadow-sm">
+                        <div class="flex justify-between items-center mb-2">
+                            <h4 class="font-bold text-sm text-slate-800">${r.name}</h4>
+                            <span class="text-[10px] uppercase font-bold px-2 py-0.5 rounded ${r.pass ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}">${r.pass ? 'PASS' : 'FAIL'}</span>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4 mt-3">
+                            <div>
+                                <div class="text-[10px] font-bold text-slate-400 uppercase mb-1">Result Analysis</div>
+                                <div class="text-xs font-mono bg-slate-50 p-2 rounded border border-slate-100 text-slate-600 whitespace-pre-wrap leading-relaxed">${r.resultMsg}</div>
+                            </div>
+                            <div>
+                                <div class="text-[10px] font-bold text-slate-400 uppercase mb-1">Test Inputs</div>
+                                <div class="text-[10px] font-mono bg-slate-50 p-2 rounded border border-slate-100 text-slate-500 h-24 overflow-y-auto">
+                                    ${JSON.stringify(r.inputs, null, 2)}
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 `).join('');
-            },
-            close: () => document.getElementById('test-modal').classList.add('hidden')
+                
+                const passed = results.filter(r => r.pass).length;
+                document.getElementById('test-status').innerHTML = `<span class="${passed === results.length ? 'text-emerald-600' : 'text-orange-500'} font-bold">${passed}/${results.length} Passed</span>`;
+            }
         };
 
-
-        // --- 3. UI & APP CONTROLLER ---
+        // --- 4. UI & APP CONTROLLER (Same as previous) ---
         const app = {
-            data: {},
-            events: [], 
-            helpMode: false,
-            apiKey: localStorage.getItem('fire_api_key') || '',
+            data: {}, events: [], helpMode: false, apiKey: localStorage.getItem('fire_api_key') || '',
             helpData: {
                 'profile': { title: "Profile", desc: "Basic timeline settings. Coast FIRE assumes you stop saving early but let your money grow until retirement." },
                 'age': { title: "Current Age", desc: "Your age today. The simulation starts here." },
@@ -511,37 +465,6 @@
             }
         };
         
-        // Initial Defaults
-        const defaults = {
-            age: 35,
-            retireAge: 60,
-            stopContribAge: 55, 
-            savingsTaxable: 20000,
-            savingsDeferred: 60000,
-            savingsFree: 20000,
-            contribTaxable: 5000,
-            contribDeferred: 15000,
-            contribFree: 5000,
-            return: 8.0,
-            retireReturn: 5.0,
-            volatility: 12.0, 
-            inflation: 3.0,
-            expenses: 60000,
-            taxRateIncome: 20,
-            taxRateCap: 15,
-            swr: 4.0,
-            ssHaircut: 100,
-            ssAge: 67,
-            ssAmount: 2500,
-            ssSpouseCurrentAge: 35,
-            ssSpouseAge: 67,
-            ssSpouseAmount: 0,
-            lateSpendAge: 80,
-            lateSpendLevel: 100
-        };
-
-        const inputs = {}; 
-        
         function bindInput(id, defaultValue) {
             if (['ssSpouseCurrentAge', 'savingsTaxable', 'savingsDeferred', 'savingsFree', 'contribTaxable', 'contribDeferred', 'contribFree', 'taxRateIncome', 'taxRateCap', 'lateSpendAge', 'lateSpendLevel'].includes(id)) {
                 const num = document.getElementById('num-' + id);
@@ -565,53 +488,21 @@
 
         // UI Refs
         const res = {
-            coastAge: document.getElementById('res-coastAge'),
-            coastDetails: document.getElementById('res-coastDetails'),
-            tippingAge: document.getElementById('res-tippingAge'),
-            endPortfolio: document.getElementById('res-endPortfolio'),
-            endStatus: document.getElementById('res-endStatus'),
-            analysis: document.getElementById('analysis-text'),
-            chartLegend: document.getElementById('chart-legend'),
-            chartTitle: document.getElementById('chart-title'),
-            tableBody: document.getElementById('table-body'),
-            totalSavings: document.getElementById('total-savings-display'),
-            totalContrib: document.getElementById('total-contrib-display'),
-            fiNumber: document.getElementById('fi-number-display')
+            coastAge: document.getElementById('res-coastAge'), coastDetails: document.getElementById('res-coastDetails'), tippingAge: document.getElementById('res-tippingAge'),
+            endPortfolio: document.getElementById('res-endPortfolio'), endStatus: document.getElementById('res-endStatus'), analysis: document.getElementById('analysis-text'),
+            chartLegend: document.getElementById('chart-legend'), chartTitle: document.getElementById('chart-title'), tableBody: document.getElementById('table-body'),
+            totalSavings: document.getElementById('total-savings-display'), totalContrib: document.getElementById('total-contrib-display'), fiNumber: document.getElementById('fi-number-display')
         };
-
-        const canvas = document.getElementById('mainChart');
-        const ctx = canvas.getContext('2d');
-        const tooltip = document.getElementById('chart-tooltip');
-
-        let mode = 'balance'; 
-        let chartData = [];
-        let mcData = []; 
-
-        const fmtMoney = (n) => {
-            if (Math.abs(n) >= 1000000) return '$' + (n/1000000).toFixed(1) + 'M';
-            if (Math.abs(n) >= 1000) return '$' + (n/1000).toFixed(0) + 'k';
-            return '$' + n.toFixed(0);
-        };
+        const canvas = document.getElementById('mainChart'); const ctx = canvas.getContext('2d'); const tooltip = document.getElementById('chart-tooltip');
+        let mode = 'balance'; let chartData = []; let mcData = []; 
+        const fmtMoney = (n) => { if (Math.abs(n) >= 1000000) return '$' + (n/1000000).toFixed(1) + 'M'; if (Math.abs(n) >= 1000) return '$' + (n/1000).toFixed(0) + 'k'; return '$' + n.toFixed(0); };
         const fmtFullMoney = (n) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n);
 
-        // --- Core Functions (Existing) ---
         window.setMode = (m) => {
-            mode = m;
-            document.querySelectorAll('button[id^="btn-"]').forEach(b => {
-                b.className = "px-3 py-1.5 rounded text-slate-500 hover:text-slate-700 transition-all";
-                if(b.id === 'btn-monteCarlo') b.className += " flex items-center gap-1 hover:bg-purple-50 hover:text-purple-600";
-            });
+            mode = m; document.querySelectorAll('button[id^="btn-"]').forEach(b => { b.className = "px-3 py-1.5 rounded text-slate-500 hover:text-slate-700 transition-all"; if(b.id === 'btn-monteCarlo') b.className += " flex items-center gap-1 hover:bg-purple-50 hover:text-purple-600"; });
             const activeBtn = document.getElementById('btn-' + m);
-            if(m === 'monteCarlo') {
-                activeBtn.className = "px-3 py-1.5 rounded shadow-sm bg-purple-600 text-white font-bold transition-all flex items-center gap-1";
-                res.chartTitle.innerText = "Monte Carlo Simulation (500 Runs)";
-                document.getElementById('mc-export-container').classList.remove('hidden');
-            } else {
-                activeBtn.className = "px-3 py-1.5 rounded shadow-sm bg-white text-indigo-600 font-bold transition-all";
-                if(m === 'balance') res.chartTitle.innerText = "Portfolio Balance (Sum of Buckets)";
-                if(m === 'income') res.chartTitle.innerText = "Income vs Expenses";
-                document.getElementById('mc-export-container').classList.add('hidden');
-            }
+            if(m === 'monteCarlo') { activeBtn.className = "px-3 py-1.5 rounded shadow-sm bg-purple-600 text-white font-bold transition-all flex items-center gap-1"; res.chartTitle.innerText = "Monte Carlo Simulation (500 Runs)"; document.getElementById('mc-export-container').classList.remove('hidden'); } 
+            else { activeBtn.className = "px-3 py-1.5 rounded shadow-sm bg-white text-indigo-600 font-bold transition-all"; if(m === 'balance') res.chartTitle.innerText = "Portfolio Balance (Sum of Buckets)"; if(m === 'income') res.chartTitle.innerText = "Income vs Expenses"; document.getElementById('mc-export-container').classList.add('hidden'); }
             calculate(); 
         }
 
@@ -619,48 +510,47 @@
         document.getElementById('api-key').value = app.apiKey;
         app.saveKey = () => { const k = document.getElementById('api-key').value; localStorage.setItem('fire_api_key', k); app.apiKey = k; alert('Key Saved'); };
         app.toggleCopilot = () => document.getElementById('copilot-modal').classList.toggle('hidden');
-        app.addChatMessage = (role, text) => {
-            const div = document.createElement('div'); div.className = `chat-bubble ${role === 'user' ? 'chat-user' : 'chat-ai'}`;
-            div.innerHTML = role === 'user' ? text : marked.parse(text);
-            document.getElementById('chat-history').appendChild(div);
-            const container = document.getElementById('chat-history'); container.scrollTop = container.scrollHeight;
-        };
+        app.addChatMessage = (role, text) => { const div = document.createElement('div'); div.className = `chat-bubble ${role === 'user' ? 'chat-user' : 'chat-ai'}`; div.innerHTML = role === 'user' ? text : marked.parse(text); document.getElementById('chat-history').appendChild(div); const container = document.getElementById('chat-history'); container.scrollTop = container.scrollHeight; };
         app.sendChat = async () => {
             const input = document.getElementById('chat-input'); const prompt = input.value.trim();
             if (!prompt) return; if (!app.apiKey) return alert("Please enter your OpenAI API Key first.");
             app.addChatMessage('user', prompt); input.value = '';
             const currentContext = { ...app.data }; delete currentContext.events; 
             const contextData = { settings: currentContext, events: app.events };
-            const systemPrompt = `You are the AI Copilot for a Retirement Planning App. Your goal is to modify the user's financial plan based on their natural language request. Current State (JSON): ${JSON.stringify(contextData)} INSTRUCTIONS: 1. Analyze the user's request. 2. Calculate any relative changes (e.g. "Increase savings by 10%"). 3. Return ONLY a valid JSON object containing the *updated* 'settings' and 'events' arrays. 4. Do NOT explain your math. Do NOT return markdown formatting like \`\`\`json. Just the raw JSON. 5. If adding events, give them unique IDs (Date.now() + random).`;
+            const systemPrompt = `You are the AI Copilot for a Retirement Planning App. Current State (JSON): ${JSON.stringify(contextData)} INSTRUCTIONS: 1. Analyze the user's request. 2. Calculate any relative changes. 3. Return ONLY a valid JSON object containing updated 'settings' and 'events'. 4. Do NOT use markdown.`;
             app.addChatMessage('ai', '<span class="animate-pulse">Thinking...</span>');
             try {
                 const response = await fetch('https://api.openai.com/v1/chat/completions', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${app.apiKey}` }, body: JSON.stringify({ model: "gpt-4-turbo-preview", messages: [{ role: "system", content: systemPrompt }, { role: "user", content: prompt }], temperature: 0.2 }) });
                 const json = await response.json(); if (json.error) throw new Error(json.error.message);
-                const aiText = json.choices[0].message.content; let cleanJsonStr = aiText.replace(/```json/g, '').replace(/```/g, '').trim(); const newData = JSON.parse(cleanJsonStr);
+                const aiText = json.choices[0].message.content; 
+                let cleanJsonStr = aiText.replace(/```json/g, '').replace(/```/g, '').trim(); 
+                const newData = JSON.parse(cleanJsonStr);
                 if(newData.settings) app.loadData(newData.settings, null);
                 if(newData.events) { app.events = newData.events; app.renderEventsList(); calculate(); }
                 const history = document.getElementById('chat-history'); history.removeChild(history.lastChild);
-                app.addChatMessage('ai', "Scenario updated successfully based on your request.");
+                app.addChatMessage('ai', "Scenario updated successfully.");
             } catch (err) {
                 const history = document.getElementById('chat-history'); history.removeChild(history.lastChild); app.addChatMessage('ai', `Error: ${err.message}`);
             }
         };
         document.getElementById('chat-input').addEventListener('keydown', (e) => { if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); app.sendChat(); } });
 
-        // --- Help Mode Logic ---
-        app.toggleHelpMode = () => {
-            app.helpMode = !app.helpMode; const btn = document.getElementById('btn-help-mode');
-            if(app.helpMode) { btn.className = "text-[10px] uppercase font-bold bg-indigo-600 text-white border border-indigo-600 rounded px-2 py-0.5 transition-colors flex items-center gap-1"; document.body.classList.add('help-mode-active'); } 
-            else { btn.className = "text-[10px] uppercase font-bold text-slate-400 hover:text-white border border-slate-600 rounded px-2 py-0.5 transition-colors flex items-center gap-1"; document.body.classList.remove('help-mode-active'); document.getElementById('help-tooltip').classList.add('hidden'); }
+        // --- Help System (New: Hover Logic) ---
+        app.showHelp = (el, key) => {
+            const info = app.helpData[key]; if (!info) return;
+            const tt = document.getElementById('help-tooltip');
+            document.getElementById('help-title').innerText = info.title;
+            document.getElementById('help-desc').innerText = info.desc;
+            tt.classList.remove('hidden');
+            const rect = el.getBoundingClientRect();
+            tt.style.top = (rect.bottom + 8) + 'px';
+            // Align to left of element, but clamp to screen width
+            let left = rect.left; 
+            if (left + 280 > window.innerWidth) left = window.innerWidth - 300;
+            if (left < 10) left = 10;
+            tt.style.left = left + 'px';
         };
-        document.addEventListener('mouseover', (e) => {
-            if (!app.helpMode) return; const target = e.target.closest('[data-help]');
-            if (target) { const key = target.getAttribute('data-help'); const info = app.helpData[key]; if (info) { document.getElementById('help-title').innerText = info.title; document.getElementById('help-desc').innerText = info.desc; const tt = document.getElementById('help-tooltip'); tt.classList.remove('hidden'); const rect = target.getBoundingClientRect(); tt.style.top = (rect.bottom + 10) + 'px'; tt.style.left = Math.min(rect.left, window.innerWidth - 320) + 'px'; target.classList.add('help-highlight'); } }
-        });
-        document.addEventListener('mouseout', (e) => {
-            if (!app.helpMode) return; const target = e.target.closest('[data-help]');
-            if (target) { document.getElementById('help-tooltip').classList.add('hidden'); target.classList.remove('help-highlight'); }
-        });
+        app.hideHelp = () => document.getElementById('help-tooltip').classList.add('hidden');
 
         // --- Other logic (Event Mgmt, Sim) ---
         app.toggleEventForm = () => document.getElementById('event-form').classList.toggle('hidden');
@@ -697,10 +587,14 @@
                 const isRetired = age >= p.retireAge, isContributing = age < effectiveStopContrib, isCoasting = !isRetired && !isContributing;
                 
                 let rCurrent = isRetired ? rRet : rAcc;
-                if (useRandom) rCurrent += (vol * randn_bm());
+                if (useRandom) rCurrent += (vol * this.randn_bm());
                 
-                portTaxable += portTaxable*rCurrent; portDeferred += portDeferred*rCurrent; portFree += portFree*rCurrent;
-                const totalGrowth = (startTaxable*rCurrent) + (startDeferred*rCurrent) + (startFree*rCurrent);
+                const growthTaxable = portTaxable * rCurrent;
+                const growthDeferred = portDeferred * rCurrent;
+                const growthFree = portFree * rCurrent;
+                
+                portTaxable += growthTaxable; portDeferred += growthDeferred; portFree += growthFree;
+                const totalGrowth = growthTaxable + growthDeferred + growthFree;
 
                 const yearsOfInf = year - new Date().getFullYear();
                 const inflationFactor = Math.pow(1+inf, yearsOfInf);
@@ -710,7 +604,7 @@
                 const ssTotal = (userSS+spouseSS)*haircut;
 
                 let eventsSum=0, eventDetails=[];
-                app.events.forEach(e => { if(age>=e.start && age<=e.end) { const v=e.amt*inflationFactor; eventsSum+=v; eventDetails.push(`${e.name}: ${fmtFullMoney(v)}`); } });
+                app.events.forEach(e => { if(age>=e.start && age<=e.end) { const v=e.amt*inflationFactor; eventsSum+=v; eventDetails.push(`${e.name}: ${v.toFixed(0)}`); } });
 
                 let totalTaxPaid=0, netFlowDisplay=0, flow=0, withdrawTaxable=0, withdrawDeferred=0, withdrawFree=0;
                 let effectiveExpenses = expenses;
@@ -751,11 +645,11 @@
             return { trajectory, tippingAge };
         }
 
-        function checkCoastSWR(p, stopAge) {
-            const sim = simulateTrajectory(p, false, stopAge);
-            const retireData = sim.trajectory.find(d => d.age === p.retireAge);
-            if(!retireData) return false;
-            return (retireData.portfolio * (p.swr/100)) >= (retireData.expenses - retireData.ssTotal);
+        function checkCoastSafety(p, stopAge) {
+             const sim = RetirementEngine.simulateTrajectory(p, app.events, false, stopAge);
+             // Check if we survived to 90 (or max age)
+             const lastPoint = sim.trajectory[sim.trajectory.length - 1];
+             return lastPoint && lastPoint.portfolio > 0;
         }
 
         function calculate() {
@@ -773,7 +667,11 @@
             const port90 = chartData.find(d => d.age === 90)?.portfolio || 0;
 
             let foundCoastAge = null;
-            if (mode !== 'monteCarlo') { for (let a = p.age; a <= p.retireAge; a++) { if (checkCoastSWR(p, a)) { foundCoastAge = a; break; } } }
+            if (mode !== 'monteCarlo') { 
+                for (let a = p.age; a <= p.retireAge; a++) { 
+                    if (checkCoastSafety(p, a)) { foundCoastAge = a; break; } 
+                }
+            }
 
             const fiNumber = p.expenses / (p.swr/100);
             res.fiNumber.innerText = `FI Target: ${fmtMoney(fiNumber)}`;
@@ -862,7 +760,7 @@
             document.getElementById('audit-content').innerHTML=html;
         };
 
-        // --- Save/Load Logic ---
+        // --- Save/Load Logic (Updated for Grouping) ---
         app.saveToLocal = () => {
             const saves = JSON.parse(localStorage.getItem('fire_scenarios') || '[]');
             if(!app.scenarioName.trim()) { alert("Please name your scenario"); return; }
@@ -902,7 +800,7 @@
         app.closeLoadModal=()=>document.getElementById('load-modal').classList.add('hidden');
         app.loadScenario=(id)=>{const s=JSON.parse(localStorage.getItem('fire_scenarios')).find(x=>x.id===id);if(s){app.loadData(s.data,s.name);app.closeLoadModal();}};
         app.loadData=(data,name)=>{if(name){app.scenarioName=name;document.getElementById('scenario-name').value=name;}Object.keys(data).forEach(key=>{if(inputs[key]){if(inputs[key].range)inputs[key].range.value=data[key];if(inputs[key].num)inputs[key].num.value=data[key];}});app.events=data.events||[];app.renderEventsList();calculate();};
-        app.importJson=(input)=>{const r=new FileReader();r.onload=(e)=>app.loadData(JSON.parse(e.target.result).data,JSON.parse(e.target.result).name);r.readAsText(input.files[0]);input.value='';};
+        app.importJson=(input)=>{const r=new FileReader();r.onload=(e)=>{try{const j=JSON.parse(e.target.result);if(j.data)app.loadData(j.data,j.name||"Imported");else alert("Invalid file");}catch(err){alert("Error parsing JSON");}};r.readAsText(input.files[0]);input.value='';};
         app.exportTableJson=()=>{if(!chartData.length)return;const s="data:text/json;charset=utf-8,"+encodeURIComponent(JSON.stringify(chartData,null,2));const l=document.createElement('a');l.href=s;l.download=`${app.scenarioName}_Breakdown.json`;document.body.appendChild(l);l.click();l.remove();};
         app.exportJson=()=>{const d="data:text/json;charset=utf-8,"+encodeURIComponent(JSON.stringify({name:app.scenarioName,data:app.data},null,2));const n=document.createElement('a');n.href=d;n.download=`${app.scenarioName}.json`;document.body.appendChild(n);n.click();n.remove();};
         app.exportMcCsv=()=>{if(!mcData.length)return alert("Run simulation first!");const h=["Year","Age",...Array.from({length:mcData.length},(_,i)=>`Run_${i+1}`)];const r=chartData.map((d,i)=>[d.year,d.age,...mcData.map(run=>run[i].toFixed(2))].join(","));const c="data:text/csv;charset=utf-8,"+ [h.join(","),...r].join("\n");const l=document.createElement("a");l.href=encodeURI(c);l.download=`${app.scenarioName}_MonteCarlo_Raw.csv`;document.body.appendChild(l);l.click();l.remove();};
