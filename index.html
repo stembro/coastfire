@@ -269,50 +269,37 @@
     <!-- AI Copilot Modal -->
     <div id="copilot-modal" class="hidden fixed inset-0 z-[200] overflow-hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
         <div class="absolute inset-0 bg-slate-900/50 transition-opacity backdrop-blur-sm" onclick="app.toggleCopilot()"></div>
-        
-        <!-- Sidebar Drawer -->
         <div class="absolute inset-y-0 right-0 max-w-sm w-full flex">
             <div class="relative w-full h-full bg-white shadow-2xl flex flex-col transform transition-transform">
-                
-                <!-- Header -->
                 <div class="bg-indigo-600 px-4 py-4 flex justify-between items-center text-white">
-                    <div>
-                        <h2 class="text-lg font-bold">AI Copilot</h2>
-                        <p class="text-[10px] text-indigo-200">Describe your scenario in plain English.</p>
-                    </div>
+                    <div><h2 class="text-lg font-bold">AI Copilot</h2><p class="text-[10px] text-indigo-200">Describe your scenario in plain English.</p></div>
                     <button onclick="app.toggleCopilot()" class="text-indigo-200 hover:text-white"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
                 </div>
-
-                <!-- Config (Key) -->
-                <div class="bg-slate-50 p-4 border-b border-slate-200" id="api-config">
-                    <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">OpenAI Compatible API Key</label>
-                    <div class="flex gap-2">
-                        <input type="password" id="api-key" class="flex-1 bg-white border border-slate-300 rounded text-xs px-2 py-1.5 focus:outline-none focus:border-indigo-500" placeholder="sk-...">
-                        <button onclick="app.saveKey()" class="bg-white border border-slate-300 text-slate-600 text-xs px-3 rounded hover:bg-slate-100">Save</button>
-                    </div>
-                    <p class="text-[9px] text-slate-400 mt-1">Stored locally in your browser. Not sent to any server other than OpenAI.</p>
-                </div>
-
-                <!-- Chat Area -->
-                <div class="flex-1 overflow-y-auto p-4 flex flex-col space-y-4 bg-slate-50" id="chat-history">
-                    <div class="chat-system">Copilot Ready. Try: "I want to retire at 50 with 2M" or "Add a wedding expense of 30k at age 32"</div>
-                </div>
-
-                <!-- Input Area -->
-                <div class="p-4 bg-white border-t border-slate-200">
-                    <div class="relative">
-                        <textarea id="chat-input" rows="2" class="w-full bg-slate-50 border border-slate-300 rounded-lg pl-3 pr-10 py-2 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 resize-none" placeholder="Type your plan..."></textarea>
-                        <button onclick="app.sendChat()" class="absolute right-2 bottom-2 text-indigo-500 hover:text-indigo-700">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
-                        </button>
-                    </div>
-                </div>
+                <div class="bg-slate-50 p-4 border-b border-slate-200" id="api-config"><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">OpenAI Compatible API Key</label><div class="flex gap-2"><input type="password" id="api-key" class="flex-1 bg-white border border-slate-300 rounded text-xs px-2 py-1.5 focus:outline-none focus:border-indigo-500" placeholder="sk-..."><button onclick="app.saveKey()" class="bg-white border border-slate-300 text-slate-600 text-xs px-3 rounded hover:bg-slate-100">Save</button></div><p class="text-[9px] text-slate-400 mt-1">Stored locally in your browser. Not sent to any server other than OpenAI.</p></div>
+                <div class="flex-1 overflow-y-auto p-4 flex flex-col space-y-4 bg-slate-50" id="chat-history"><div class="chat-system">Copilot Ready. Try: "I want to retire at 50 with 2M" or "Add a wedding expense of 30k at age 32"</div></div>
+                <div class="p-4 bg-white border-t border-slate-200"><div class="relative"><textarea id="chat-input" rows="2" class="w-full bg-slate-50 border border-slate-300 rounded-lg pl-3 pr-10 py-2 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 resize-none" placeholder="Type your plan..."></textarea><button onclick="app.sendChat()" class="absolute right-2 bottom-2 text-indigo-500 hover:text-indigo-700"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg></button></div></div>
             </div>
         </div>
     </div>
 
-    <!-- Load/Audit Modals (Keep existing structure) -->
-    <div id="load-modal" class="hidden fixed inset-0 z-[100] overflow-y-auto"><div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0"><div class="fixed inset-0 modal-backdrop" onclick="app.closeLoadModal()"></div><div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"><div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4"><h3 class="text-lg leading-6 font-medium text-gray-900">Load Scenario</h3><ul id="scenario-list" class="mt-4 divide-y divide-slate-200 max-h-60 overflow-y-auto"></ul></div><div class="bg-slate-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse"><button class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm" onclick="app.closeLoadModal()">Cancel</button></div></div></div></div>
+    <!-- Load/Audit Modals -->
+    <div id="load-modal" class="hidden fixed inset-0 z-[100] overflow-y-auto">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 modal-backdrop" onclick="app.closeLoadModal()"></div>
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="flex items-center gap-2 mb-2">
+                        <button id="modal-back-btn" class="hidden text-slate-400 hover:text-indigo-600"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button>
+                        <h3 class="text-lg leading-6 font-medium text-gray-900">Load Scenario</h3>
+                    </div>
+                    <ul id="scenario-list" class="mt-4 divide-y divide-slate-200 max-h-60 overflow-y-auto"></ul>
+                </div>
+                <div class="bg-slate-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm" onclick="app.closeLoadModal()">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <div id="audit-modal" class="hidden fixed inset-0 z-[150] overflow-y-auto"><div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:p-0"><div class="fixed inset-0 modal-backdrop" onclick="document.getElementById('audit-modal').classList.add('hidden')"></div><div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full"><div class="bg-white px-4 pt-5 pb-4 sm:p-6"><div class="flex justify-between items-start border-b pb-2 mb-4"><h3 class="text-lg leading-6 font-bold text-gray-900" id="audit-title">Audit</h3><button onclick="document.getElementById('audit-modal').classList.add('hidden')" class="text-gray-400 hover:text-gray-500">X</button></div><div id="audit-content" class="text-xs font-mono text-slate-600 space-y-2 max-h-[60vh] overflow-y-auto"></div></div></div></div></div>
 
     <!-- App Logic -->
@@ -461,192 +448,66 @@
         }
 
         // --- AI COPILOT LOGIC ---
-        
-        // Setup API Key
         document.getElementById('api-key').value = app.apiKey;
-        app.saveKey = () => {
-            const k = document.getElementById('api-key').value;
-            localStorage.setItem('fire_api_key', k);
-            app.apiKey = k;
-            alert('Key Saved');
-        };
-
+        app.saveKey = () => { const k = document.getElementById('api-key').value; localStorage.setItem('fire_api_key', k); app.apiKey = k; alert('Key Saved'); };
         app.toggleCopilot = () => document.getElementById('copilot-modal').classList.toggle('hidden');
-
         app.addChatMessage = (role, text) => {
-            const div = document.createElement('div');
-            div.className = `chat-bubble ${role === 'user' ? 'chat-user' : 'chat-ai'}`;
-            // Use marked for basic formatting in AI response
+            const div = document.createElement('div'); div.className = `chat-bubble ${role === 'user' ? 'chat-user' : 'chat-ai'}`;
             div.innerHTML = role === 'user' ? text : marked.parse(text);
             document.getElementById('chat-history').appendChild(div);
-            // Scroll to bottom
-            const container = document.getElementById('chat-history');
-            container.scrollTop = container.scrollHeight;
+            const container = document.getElementById('chat-history'); container.scrollTop = container.scrollHeight;
         };
-
         app.sendChat = async () => {
-            const input = document.getElementById('chat-input');
-            const prompt = input.value.trim();
-            if (!prompt) return;
-            if (!app.apiKey) return alert("Please enter your OpenAI API Key first.");
-
-            app.addChatMessage('user', prompt);
-            input.value = '';
-            
-            // Build Context
-            // We strip out the large trajectory array to save tokens
-            const currentContext = { ...app.data };
-            delete currentContext.events; // Events are in app.events
-            const contextData = {
-                settings: currentContext,
-                events: app.events
-            };
-
-            const systemPrompt = `
-                You are the AI Copilot for a Retirement Planning App.
-                Your goal is to modify the user's financial plan based on their natural language request.
-                
-                Current State (JSON):
-                ${JSON.stringify(contextData)}
-
-                INSTRUCTIONS:
-                1. Analyze the user's request.
-                2. Calculate any relative changes (e.g. "Increase savings by 10%").
-                3. Return ONLY a valid JSON object containing the *updated* 'settings' and 'events' arrays.
-                4. Do NOT explain your math. Do NOT return markdown formatting like \`\`\`json. Just the raw JSON.
-                5. If adding events, give them unique IDs (Date.now() + random).
-            `;
-
+            const input = document.getElementById('chat-input'); const prompt = input.value.trim();
+            if (!prompt) return; if (!app.apiKey) return alert("Please enter your OpenAI API Key first.");
+            app.addChatMessage('user', prompt); input.value = '';
+            const currentContext = { ...app.data }; delete currentContext.events; 
+            const contextData = { settings: currentContext, events: app.events };
+            const systemPrompt = `You are the AI Copilot for a Retirement Planning App. Your goal is to modify the user's financial plan based on their natural language request. Current State (JSON): ${JSON.stringify(contextData)} INSTRUCTIONS: 1. Analyze the user's request. 2. Calculate any relative changes (e.g. "Increase savings by 10%"). 3. Return ONLY a valid JSON object containing the *updated* 'settings' and 'events' arrays. 4. Do NOT explain your math. Do NOT return markdown formatting like \`\`\`json. Just the raw JSON. 5. If adding events, give them unique IDs (Date.now() + random).`;
             app.addChatMessage('ai', '<span class="animate-pulse">Thinking...</span>');
-
             try {
-                const response = await fetch('https://api.openai.com/v1/chat/completions', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${app.apiKey}`
-                    },
-                    body: JSON.stringify({
-                        model: "gpt-4-turbo-preview", // Or gpt-3.5-turbo
-                        messages: [
-                            { role: "system", content: systemPrompt },
-                            { role: "user", content: prompt }
-                        ],
-                        temperature: 0.2
-                    })
-                });
-
-                const json = await response.json();
-                
-                if (json.error) {
-                    throw new Error(json.error.message);
-                }
-
-                const aiText = json.choices[0].message.content;
-                
-                // Parse JSON from response (try to clean code blocks if model ignores instructions)
-                let cleanJsonStr = aiText.replace(/```json/g, '').replace(/```/g, '').trim();
-                const newData = JSON.parse(cleanJsonStr);
-
-                // Update App
+                const response = await fetch('https://api.openai.com/v1/chat/completions', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${app.apiKey}` }, body: JSON.stringify({ model: "gpt-4-turbo-preview", messages: [{ role: "system", content: systemPrompt }, { role: "user", content: prompt }], temperature: 0.2 }) });
+                const json = await response.json(); if (json.error) throw new Error(json.error.message);
+                const aiText = json.choices[0].message.content; let cleanJsonStr = aiText.replace(/```json/g, '').replace(/```/g, '').trim(); const newData = JSON.parse(cleanJsonStr);
                 if(newData.settings) app.loadData(newData.settings, null);
-                if(newData.events) {
-                    app.events = newData.events;
-                    app.renderEventsList();
-                    calculate();
-                }
-
-                // Remove loading msg
-                const history = document.getElementById('chat-history');
-                history.removeChild(history.lastChild);
-                
+                if(newData.events) { app.events = newData.events; app.renderEventsList(); calculate(); }
+                const history = document.getElementById('chat-history'); history.removeChild(history.lastChild);
                 app.addChatMessage('ai', "Scenario updated successfully based on your request.");
-
             } catch (err) {
-                const history = document.getElementById('chat-history');
-                history.removeChild(history.lastChild);
-                app.addChatMessage('ai', `Error: ${err.message}`);
+                const history = document.getElementById('chat-history'); history.removeChild(history.lastChild); app.addChatMessage('ai', `Error: ${err.message}`);
             }
         };
-
-        // Allow Enter to send
-        document.getElementById('chat-input').addEventListener('keydown', (e) => {
-            if(e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                app.sendChat();
-            }
-        });
-
+        document.getElementById('chat-input').addEventListener('keydown', (e) => { if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); app.sendChat(); } });
 
         // --- Help Mode Logic ---
         app.toggleHelpMode = () => {
-            app.helpMode = !app.helpMode;
-            const btn = document.getElementById('btn-help-mode');
-            if(app.helpMode) {
-                btn.className = "text-[10px] uppercase font-bold bg-indigo-600 text-white border border-indigo-600 rounded px-2 py-0.5 transition-colors flex items-center gap-1";
-                document.body.classList.add('help-mode-active');
-            } else {
-                btn.className = "text-[10px] uppercase font-bold text-slate-400 hover:text-white border border-slate-600 rounded px-2 py-0.5 transition-colors flex items-center gap-1";
-                document.body.classList.remove('help-mode-active');
-                document.getElementById('help-tooltip').classList.add('hidden');
-            }
+            app.helpMode = !app.helpMode; const btn = document.getElementById('btn-help-mode');
+            if(app.helpMode) { btn.className = "text-[10px] uppercase font-bold bg-indigo-600 text-white border border-indigo-600 rounded px-2 py-0.5 transition-colors flex items-center gap-1"; document.body.classList.add('help-mode-active'); } 
+            else { btn.className = "text-[10px] uppercase font-bold text-slate-400 hover:text-white border border-slate-600 rounded px-2 py-0.5 transition-colors flex items-center gap-1"; document.body.classList.remove('help-mode-active'); document.getElementById('help-tooltip').classList.add('hidden'); }
         };
-        // Listeners
         document.addEventListener('mouseover', (e) => {
-            if (!app.helpMode) return;
-            const target = e.target.closest('[data-help]');
-            if (target) {
-                const key = target.getAttribute('data-help');
-                const info = app.helpData[key];
-                if (info) {
-                    document.getElementById('help-title').innerText = info.title;
-                    document.getElementById('help-desc').innerText = info.desc;
-                    const tt = document.getElementById('help-tooltip');
-                    tt.classList.remove('hidden');
-                    const rect = target.getBoundingClientRect();
-                    tt.style.top = (rect.bottom + 10) + 'px';
-                    tt.style.left = Math.min(rect.left, window.innerWidth - 320) + 'px';
-                    target.classList.add('help-highlight');
-                }
-            }
+            if (!app.helpMode) return; const target = e.target.closest('[data-help]');
+            if (target) { const key = target.getAttribute('data-help'); const info = app.helpData[key]; if (info) { document.getElementById('help-title').innerText = info.title; document.getElementById('help-desc').innerText = info.desc; const tt = document.getElementById('help-tooltip'); tt.classList.remove('hidden'); const rect = target.getBoundingClientRect(); tt.style.top = (rect.bottom + 10) + 'px'; tt.style.left = Math.min(rect.left, window.innerWidth - 320) + 'px'; target.classList.add('help-highlight'); } }
         });
         document.addEventListener('mouseout', (e) => {
-            if (!app.helpMode) return;
-            const target = e.target.closest('[data-help]');
-            if (target) {
-                document.getElementById('help-tooltip').classList.add('hidden');
-                target.classList.remove('help-highlight');
-            }
+            if (!app.helpMode) return; const target = e.target.closest('[data-help]');
+            if (target) { document.getElementById('help-tooltip').classList.add('hidden'); target.classList.remove('help-highlight'); }
         });
 
-        // --- Other logic (Event Mgmt, Sim) same as before ---
-        
+        // --- Other logic (Event Mgmt, Sim) ---
         app.toggleEventForm = () => document.getElementById('event-form').classList.toggle('hidden');
         app.addEvent = () => {
-            const name = document.getElementById('evt-name').value;
-            const start = parseInt(document.getElementById('evt-start').value);
-            const end = parseInt(document.getElementById('evt-end').value);
-            const amt = parseFloat(document.getElementById('evt-amt').value);
-            if(!name || isNaN(start) || isNaN(end) || isNaN(amt)) return alert("Please fill all event fields correctly.");
-            if(end < start) return alert("End age must be greater than or equal to start age.");
+            const name = document.getElementById('evt-name').value; const start = parseInt(document.getElementById('evt-start').value); const end = parseInt(document.getElementById('evt-end').value); const amt = parseFloat(document.getElementById('evt-amt').value);
+            if(!name || isNaN(start) || isNaN(end) || isNaN(amt)) return alert("Please fill all event fields correctly."); if(end < start) return alert("End age must be greater than or equal to start age.");
             app.events.push({ id: Date.now(), name, start, end, amt });
-            document.getElementById('evt-name').value = "";
-            document.getElementById('evt-start').value = "";
-            document.getElementById('evt-end').value = "";
-            document.getElementById('evt-amt').value = "";
-            app.toggleEventForm();
-            app.renderEventsList();
-            calculate();
+            document.getElementById('evt-name').value = ""; document.getElementById('evt-start').value = ""; document.getElementById('evt-end').value = ""; document.getElementById('evt-amt').value = "";
+            app.toggleEventForm(); app.renderEventsList(); calculate();
         };
         app.removeEvent = (id) => { app.events = app.events.filter(e => e.id !== id); app.renderEventsList(); calculate(); };
         app.renderEventsList = () => {
             const list = document.getElementById('event-list');
             if(app.events.length === 0) { list.innerHTML = `<p class="text-xs text-slate-400 text-center py-2">No custom events added.</p>`; return; }
-            list.innerHTML = app.events.map(e => `
-                <div class="flex justify-between items-center bg-slate-50 p-2 rounded border border-slate-100">
-                    <div><div class="text-xs font-bold text-slate-700">${e.name}</div><div class="text-[10px] text-slate-400">Age ${e.start}-${e.end}</div></div>
-                    <div class="text-right"><div class="text-xs font-mono font-bold ${e.amt >= 0 ? 'text-emerald-600' : 'text-red-500'}">${e.amt >= 0 ? '+' : ''}${fmtFullMoney(e.amt)}</div><button onclick="app.removeEvent(${e.id})" class="text-[9px] text-red-300 hover:text-red-500 underline">Remove</button></div>
-                </div>`).join('');
+            list.innerHTML = app.events.map(e => `<div class="flex justify-between items-center bg-slate-50 p-2 rounded border border-slate-100"><div><div class="text-xs font-bold text-slate-700">${e.name}</div><div class="text-[10px] text-slate-400">Age ${e.start}-${e.end}</div></div><div class="text-right"><div class="text-xs font-mono font-bold ${e.amt >= 0 ? 'text-emerald-600' : 'text-red-500'}">${e.amt >= 0 ? '+' : ''}${fmtFullMoney(e.amt)}</div><button onclick="app.removeEvent(${e.id})" class="text-[9px] text-red-300 hover:text-red-500 underline">Remove</button></div></div>`).join('');
         };
 
         function randn_bm() { let u=0,v=0; while(u===0)u=Math.random(); while(v===0)v=Math.random(); return Math.sqrt(-2.0*Math.log(u))*Math.cos(2.0*Math.PI*v); }
@@ -684,12 +545,8 @@
                 app.events.forEach(e => { if(age>=e.start && age<=e.end) { const v=e.amt*inflationFactor; eventsSum+=v; eventDetails.push(`${e.name}: ${fmtFullMoney(v)}`); } });
 
                 let totalTaxPaid=0, netFlowDisplay=0, flow=0, withdrawTaxable=0, withdrawDeferred=0, withdrawFree=0;
-
-                // --- Calculate Effective Expenses (Applying Late Life Adjustment) ---
                 let effectiveExpenses = expenses;
-                if (age >= p.lateSpendAge) {
-                    effectiveExpenses = expenses * (p.lateSpendLevel / 100);
-                }
+                if (age >= p.lateSpendAge) { effectiveExpenses = expenses * (p.lateSpendLevel / 100); }
 
                 if (!isRetired) {
                     if (isContributing) {
@@ -700,7 +557,6 @@
                     const extraCash = ssTotal + eventsSum; portTaxable+=extraCash; flow+=extraCash; netFlowDisplay=flow;
                     if (isContributing) { cTax*=(1+inf); cDef*=(1+inf); cFree*=(1+inf); }
                 } else {
-                    // Use effectiveExpenses for gap calculation
                     let gap = effectiveExpenses - (ssTotal + eventsSum);
                     if (gap < 0) { portTaxable+=Math.abs(gap); flow+=Math.abs(gap); } 
                     else {
@@ -721,13 +577,8 @@
                     netFlowDisplay = flow;
                 }
                 let totalPort = Math.max(0, portTaxable+portDeferred+portFree);
-                
-                // Note: We report effectiveExpenses in the trajectory for audit transparency
                 trajectory.push({ age, year, startTaxable, startDeferred, startFree, endTaxable:portTaxable, endDeferred:portDeferred, endFree:portFree, growthTaxable:startTaxable*rCurrent, growthDeferred:startDeferred*rCurrent, growthFree:startFree*rCurrent, rCurrent, isRetired, isCoasting, expenses: effectiveExpenses, ssTotal, eventsSum, eventDetails, drawdown:netFlowDisplay, totalTaxPaid, withdrawTaxable, withdrawDeferred, withdrawFree, inflationFactor, startPort:startTaxable+startDeferred+startFree, portfolio:totalPort, growth:totalGrowth });
-                
-                // Base expenses continue to inflate normally so we maintain the standard of living baseline
-                expenses*=(1+inf); 
-                age++; year++;
+                expenses*=(1+inf); age++; year++;
             }
             return { trajectory, tippingAge };
         }
@@ -736,7 +587,6 @@
             const sim = simulateTrajectory(p, false, stopAge);
             const retireData = sim.trajectory.find(d => d.age === p.retireAge);
             if(!retireData) return false;
-            // SWR check against *effective* expenses at retirement
             return (retireData.portfolio * (p.swr/100)) >= (retireData.expenses - retireData.ssTotal);
         }
 
@@ -844,18 +694,102 @@
             document.getElementById('audit-content').innerHTML=html;
         };
 
-        // --- Save/Load (Existing) ---
-        app.exportMcCsv=()=>{if(!mcData.length)return alert("Run simulation first!");const h=["Year","Age",...Array.from({length:mcData.length},(_,i)=>`Run_${i+1}`)];const r=chartData.map((d,i)=>[d.year,d.age,...mcData.map(run=>run[i].toFixed(2))].join(","));const c="data:text/csv;charset=utf-8,"+ [h.join(","),...r].join("\n");const l=document.createElement("a");l.href=encodeURI(c);l.download=`${app.scenarioName}_MonteCarlo_Raw.csv`;document.body.appendChild(l);l.click();l.remove();};
-        app.exportTableCsv=()=>{if(!chartData.length)return;const h=["Age","Year","Phase","Start Balance","Net Flow","Tax Paid","Growth","End Balance"];const r=chartData.map(d=>[d.age,d.year,d.isRetired?"Retired":(d.isCoasting?"Coasting":"Accumulating"),d.startPort.toFixed(2),d.drawdown.toFixed(2),d.totalTaxPaid.toFixed(2),d.growth.toFixed(2),d.portfolio.toFixed(2)].join(","));const c="data:text/csv;charset=utf-8,"+ [h.join(","),...r].join("\n");const l=document.createElement("a");l.href=encodeURI(c);l.download=`${app.scenarioName}_Breakdown.csv`;document.body.appendChild(l);l.click();l.remove();};
-        app.exportTableJson=()=>{if(!chartData.length)return;const s="data:text/json;charset=utf-8,"+encodeURIComponent(JSON.stringify(chartData,null,2));const l=document.createElement('a');l.href=s;l.download=`${app.scenarioName}_Breakdown.json`;document.body.appendChild(l);l.click();l.remove();};
-        app.exportJson=()=>{const d="data:text/json;charset=utf-8,"+encodeURIComponent(JSON.stringify({name:app.scenarioName,data:app.data},null,2));const n=document.createElement('a');n.href=d;n.download=`${app.scenarioName}.json`;document.body.appendChild(n);n.click();n.remove();};
-        app.saveToLocal=()=>{const s=JSON.parse(localStorage.getItem('fire_scenarios')||'[]');s.push({id:Date.now(),name:app.scenarioName,date:new Date().toLocaleString(),data:app.data});localStorage.setItem('fire_scenarios',JSON.stringify(s));const b=document.activeElement;b.innerHTML=`<span class="text-emerald-400">Saved!</span>`;setTimeout(()=>b.innerHTML="Save",1500);};
-        app.openLoadModal=()=>{const m=document.getElementById('load-modal');const l=document.getElementById('scenario-list');const s=JSON.parse(localStorage.getItem('fire_scenarios')||'[]');m.classList.remove('hidden');if(s.length===0){l.innerHTML=`<li class="py-4 text-center text-slate-500 text-sm">No saved scenarios.</li>`;return;}l.innerHTML=s.map(x=>`<li class="py-3 px-2 hover:bg-slate-50 flex justify-between items-center cursor-pointer" onclick="app.loadScenario(${x.id})"><div><div class="text-sm font-medium text-indigo-700">${x.name}</div><div class="text-xs text-slate-400">${x.date}</div></div><button onclick="event.stopPropagation(); app.deleteScenario(${x.id})" class="text-red-400 hover:text-red-600 text-xs">Delete</button></li>`).reverse().join('');};
+        // --- Save/Load Logic (Updated for Grouping) ---
+        app.saveToLocal = () => {
+            const saves = JSON.parse(localStorage.getItem('fire_scenarios') || '[]');
+            if(!app.scenarioName.trim()) { alert("Please name your scenario"); return; }
+            const newSave = { id: Date.now(), name: app.scenarioName.trim(), date: new Date().toLocaleString(), data: app.data };
+            saves.push(newSave);
+            localStorage.setItem('fire_scenarios', JSON.stringify(saves));
+            const btn = document.activeElement; btn.innerHTML = `<span class="text-emerald-400">Saved!</span>`; setTimeout(() => btn.innerHTML = '<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg> Save', 1500);
+        };
+
+        app.openLoadModal = () => {
+            const modal = document.getElementById('load-modal');
+            const list = document.getElementById('scenario-list');
+            const backBtn = document.getElementById('modal-back-btn');
+            
+            if(backBtn) { backBtn.classList.add('hidden'); backBtn.onclick = null; }
+            document.querySelector('#load-modal h3').innerText = "Load Scenario";
+
+            const saves = JSON.parse(localStorage.getItem('fire_scenarios') || '[]');
+            modal.classList.remove('hidden');
+            if (saves.length === 0) { list.innerHTML = `<li class="py-4 text-center text-slate-500 text-sm">No saved scenarios.</li>`; return; }
+            
+            const groups = {};
+            saves.forEach(s => { if(!groups[s.name]) groups[s.name] = []; groups[s.name].push(s); });
+            const sortedNames = Object.keys(groups).sort((a,b) => Math.max(...groups[b].map(s=>s.id)) - Math.max(...groups[a].map(s=>s.id)));
+
+            list.innerHTML = sortedNames.map(name => {
+                const versions = groups[name].sort((a,b) => b.id - a.id);
+                const latest = versions[0];
+                return `
+                <li class="py-3 px-2 hover:bg-slate-50 flex justify-between items-center group">
+                    <div class="cursor-pointer flex-1" onclick="app.loadScenario(${latest.id})">
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm font-medium text-indigo-700">${name}</span>
+                            ${versions.length > 1 ? `<span class="text-[10px] bg-slate-200 text-slate-600 px-1.5 rounded-full">${versions.length} v</span>` : ''}
+                        </div>
+                        <div class="text-xs text-slate-400">Latest: ${latest.date}</div>
+                    </div>
+                    <div class="flex items-center gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                         ${versions.length > 1 ? `<button onclick="app.showVersions('${name.replace(/'/g, "\\'")}')" class="text-indigo-400 hover:text-indigo-600 text-xs px-2 border border-slate-200 rounded py-1">History</button>` : ''}
+                         <button onclick="event.stopPropagation(); app.deleteGroup('${name.replace(/'/g, "\\'")}')" class="text-red-400 hover:text-red-600 text-xs px-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
+                    </div>
+                </li>`;
+            }).join('');
+        };
+
+        app.showVersions = (name) => {
+            const list = document.getElementById('scenario-list');
+            const backBtn = document.getElementById('modal-back-btn');
+            document.querySelector('#load-modal h3').innerText = `Versions: ${name}`;
+            
+            if(backBtn) { backBtn.classList.remove('hidden'); backBtn.onclick = app.openLoadModal; }
+
+            const saves = JSON.parse(localStorage.getItem('fire_scenarios') || '[]');
+            const versions = saves.filter(s => s.name === name).sort((a,b) => b.id - a.id);
+
+            list.innerHTML = versions.map(v => `
+                <li class="py-3 px-2 hover:bg-slate-50 flex justify-between items-center group cursor-pointer" onclick="app.loadScenario(${v.id})">
+                    <div>
+                        <div class="text-sm font-medium text-slate-700">${v.date}</div>
+                        <div class="text-xs text-slate-400">ID: ${v.id}</div>
+                    </div>
+                    <div class="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                         <button onclick="event.stopPropagation(); app.deleteVersion(${v.id}, '${name.replace(/'/g, "\\'")}')" class="text-red-400 hover:text-red-600 text-xs px-2">Delete</button>
+                    </div>
+                </li>
+            `).join('');
+        };
+
+        app.deleteGroup = (name) => {
+            if(!confirm(`Delete all versions of "${name}"?`)) return;
+            const saves = JSON.parse(localStorage.getItem('fire_scenarios') || '[]');
+            const filtered = saves.filter(s => s.name !== name);
+            localStorage.setItem('fire_scenarios', JSON.stringify(filtered));
+            app.openLoadModal();
+        };
+
+        app.deleteVersion = (id, name) => {
+            const saves = JSON.parse(localStorage.getItem('fire_scenarios') || '[]');
+            const filtered = saves.filter(s => s.id !== id);
+            localStorage.setItem('fire_scenarios', JSON.stringify(filtered));
+            // Check remaining
+            if(filtered.some(s => s.name === name)) app.showVersions(name);
+            else app.openLoadModal();
+        };
+
         app.closeLoadModal=()=>document.getElementById('load-modal').classList.add('hidden');
         app.loadScenario=(id)=>{const s=JSON.parse(localStorage.getItem('fire_scenarios')).find(x=>x.id===id);if(s){app.loadData(s.data,s.name);app.closeLoadModal();}};
-        app.deleteScenario=(id)=>{localStorage.setItem('fire_scenarios',JSON.stringify(JSON.parse(localStorage.getItem('fire_scenarios')).filter(x=>x.id!==id)));app.openLoadModal();};
+        
+        // --- Import/Export ---
         app.loadData=(data,name)=>{if(name){app.scenarioName=name;document.getElementById('scenario-name').value=name;}Object.keys(data).forEach(key=>{if(inputs[key]){if(inputs[key].range)inputs[key].range.value=data[key];if(inputs[key].num)inputs[key].num.value=data[key];}});app.events=data.events||[];app.renderEventsList();calculate();};
         app.importJson=(input)=>{const r=new FileReader();r.onload=(e)=>app.loadData(JSON.parse(e.target.result).data,JSON.parse(e.target.result).name);r.readAsText(input.files[0]);input.value='';};
+        app.exportTableJson=()=>{if(!chartData.length)return;const s="data:text/json;charset=utf-8,"+encodeURIComponent(JSON.stringify(chartData,null,2));const l=document.createElement('a');l.href=s;l.download=`${app.scenarioName}_Breakdown.json`;document.body.appendChild(l);l.click();l.remove();};
+        app.exportJson=()=>{const d="data:text/json;charset=utf-8,"+encodeURIComponent(JSON.stringify({name:app.scenarioName,data:app.data},null,2));const n=document.createElement('a');n.href=d;n.download=`${app.scenarioName}.json`;document.body.appendChild(n);n.click();n.remove();};
+        app.exportMcCsv=()=>{if(!mcData.length)return alert("Run simulation first!");const h=["Year","Age",...Array.from({length:mcData.length},(_,i)=>`Run_${i+1}`)];const r=chartData.map((d,i)=>[d.year,d.age,...mcData.map(run=>run[i].toFixed(2))].join(","));const c="data:text/csv;charset=utf-8,"+ [h.join(","),...r].join("\n");const l=document.createElement("a");l.href=encodeURI(c);l.download=`${app.scenarioName}_MonteCarlo_Raw.csv`;document.body.appendChild(l);l.click();l.remove();};
+        app.exportTableCsv=()=>{if(!chartData.length)return;const h=["Age","Year","Phase","Start Balance","Net Flow","Tax Paid","Growth","End Balance"];const r=chartData.map(d=>[d.age,d.year,d.isRetired?"Retired":(d.isCoasting?"Coasting":"Accumulating"),d.startPort.toFixed(2),d.drawdown.toFixed(2),d.totalTaxPaid.toFixed(2),d.growth.toFixed(2),d.portfolio.toFixed(2)].join(","));const c="data:text/csv;charset=utf-8,"+ [h.join(","),...r].join("\n");const l=document.createElement("a");l.href=encodeURI(c);l.download=`${app.scenarioName}_Breakdown.csv`;document.body.appendChild(l);l.click();l.remove();};
 
         // Init
         app.renderEventsList();
