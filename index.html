@@ -10,70 +10,40 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
         /* Custom range slider styling */
-        input[type=range] {
-            -webkit-appearance: none; 
-            background: transparent; 
-        }
-        input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            height: 16px;
-            width: 16px;
-            border-radius: 50%;
-            background: #4F46E5;
-            cursor: pointer;
-            margin-top: -6px; 
-            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-        }
-        input[type=range]::-webkit-slider-runnable-track {
-            width: 100%;
-            height: 4px;
-            cursor: pointer;
-            background: #E5E7EB;
-            border-radius: 2px;
-        }
+        input[type=range] { -webkit-appearance: none; background: transparent; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%; background: #4F46E5; cursor: pointer; margin-top: -6px; box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: #E5E7EB; border-radius: 2px; }
         
-        /* Specific colors */
-        .slider-acc::-webkit-slider-thumb { background: #4F46E5; } /* Indigo */
-        .slider-ret::-webkit-slider-thumb { background: #10B981; } /* Emerald */
-        .slider-ss::-webkit-slider-thumb { background: #F59E0B; } /* Amber */
+        .slider-acc::-webkit-slider-thumb { background: #4F46E5; }
+        .slider-ret::-webkit-slider-thumb { background: #10B981; }
+        .slider-ss::-webkit-slider-thumb { background: #F59E0B; }
         
         .scrolly-table::-webkit-scrollbar { width: 8px; height: 8px; }
         .scrolly-table::-webkit-scrollbar-track { background: #f1f1f1; }
         .scrolly-table::-webkit-scrollbar-thumb { background: #c7c7c7; border-radius: 4px; }
 
-        /* Number Input Styling */
-        .editable-num {
-            background: transparent;
-            border: none;
-            border-bottom: 1px solid transparent;
-            text-align: left; 
-            width: 100%;
-            font-weight: 700;
-            padding: 0;
-            transition: all 0.2s;
-        }
+        .editable-num { background: transparent; border: none; border-bottom: 1px solid transparent; text-align: left; width: 100%; font-weight: 700; padding: 0; transition: all 0.2s; }
         .editable-num:hover { border-bottom: 1px solid #cbd5e1; }
         .editable-num:focus { outline: none; border-bottom: 2px solid #4F46E5; background: #f8fafc; }
-        .editable-num::-webkit-outer-spin-button,
-        .editable-num::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .editable-num::-webkit-outer-spin-button, .editable-num::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
         
         .modal-backdrop { background-color: rgba(15, 23, 42, 0.7); }
-        
-        /* Bucket Input Group */
         .bucket-label { font-size: 10px; font-weight: 700; text-transform: uppercase; color: #64748b; margin-bottom: 2px; }
         .bucket-input { width: 100%; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 4px; padding: 4px 8px; font-size: 12px; font-family: monospace; color: #334155; }
         .bucket-input:focus { outline: none; border-color: #6366f1; background: white; }
 
-        /* Help Tooltip */
+        /* Help & Chat */
         #help-tooltip { pointer-events: none; transition: opacity 0.2s; }
         .help-mode-active { cursor: help !important; }
         .help-highlight::after { content: ''; position: absolute; top: -2px; left: -2px; right: -2px; bottom: -2px; border: 2px dashed #a5b4fc; border-radius: 6px; pointer-events: none; z-index: 10; }
-
-        /* Chat Styling */
         .chat-bubble { max-width: 85%; padding: 8px 12px; border-radius: 12px; font-size: 13px; line-height: 1.4; margin-bottom: 8px; }
         .chat-user { background: #e0e7ff; color: #3730a3; align-self: flex-end; border-bottom-right-radius: 2px; }
         .chat-ai { background: #f1f5f9; color: #334155; align-self: flex-start; border-bottom-left-radius: 2px; }
         .chat-system { font-size: 11px; color: #94a3b8; text-align: center; margin: 8px 0; }
+        
+        /* Test Runner */
+        .test-pass { color: #10b981; }
+        .test-fail { color: #ef4444; font-weight: bold; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col relative">
@@ -98,14 +68,15 @@
             <div class="text-right">
                 <div class="flex justify-end items-center mb-1 gap-2">
                     <button onclick="app.toggleCopilot()" data-help="copilot" class="text-[10px] uppercase font-bold bg-gradient-to-r from-indigo-500 to-purple-600 text-white hover:from-indigo-600 hover:to-purple-700 rounded px-2 py-0.5 transition-all flex items-center gap-1 shadow-sm">
-                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                        AI Copilot
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg> AI Copilot
+                    </button>
+                    <button onclick="tests.run()" class="text-[10px] uppercase font-bold text-emerald-400 hover:text-white border border-emerald-600 rounded px-2 py-0.5 transition-colors flex items-center gap-1">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Tests
                     </button>
                     <button onclick="app.toggleHelpMode()" id="btn-help-mode" class="text-[10px] uppercase font-bold text-slate-400 hover:text-white border border-slate-600 rounded px-2 py-0.5 transition-colors flex items-center gap-1">
-                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        Help
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Help
                     </button>
-                    <input id="scenario-name" type="text" data-help="scenario-name" class="text-right bg-transparent border-b border-transparent hover:border-slate-500 focus:border-indigo-400 text-sm font-bold text-white w-32 sm:w-48 focus:outline-none placeholder-slate-500" placeholder="Scenario Name">
+                    <input id="scenario-name" type="text" class="text-right bg-transparent border-b border-transparent hover:border-slate-500 focus:border-indigo-400 text-sm font-bold text-white w-32 sm:w-48 focus:outline-none placeholder-slate-500" placeholder="Scenario Name">
                 </div>
                 <div class="flex justify-end gap-3 text-[10px] text-indigo-300 font-medium" data-help="persistence">
                     <button onclick="app.saveToLocal()" class="hover:text-white transition-colors flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg> Save</button>
@@ -120,44 +91,23 @@
 
     <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div class="grid grid-cols-1 xl:grid-cols-12 gap-8">
-            
             <!-- LEFT SIDEBAR: CONTROLS -->
             <div class="xl:col-span-4 space-y-6 h-fit">
-                
-                <!-- SECTION 1: PROFILE & ACCUMULATION -->
+                <!-- SECTION 1: PROFILE -->
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5" data-help="profile">
                     <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 border-b pb-2">1. Profile & Timeline</h2>
                     <div class="space-y-6">
-                        <!-- Timeline Config -->
                         <div class="grid grid-cols-3 gap-4">
                             <div data-help="age"><label class="text-[10px] uppercase font-bold text-slate-400 block mb-1">Start Age</label><input type="number" id="num-age" class="editable-num text-slate-700 text-xl"><input type="range" id="age" min="18" max="70" class="w-full slider-acc mt-2"></div>
                             <div data-help="stop-contrib"><label class="text-[10px] uppercase font-bold text-indigo-400 block mb-1">Stop Saving</label><input type="number" id="num-stopContribAge" class="editable-num text-indigo-600 text-xl"><input type="range" id="stopContribAge" min="25" max="80" class="w-full slider-acc mt-2"></div>
                             <div data-help="retire-age"><label class="text-[10px] uppercase font-bold text-emerald-500 block mb-1">Retire Age</label><input type="number" id="num-retireAge" class="editable-num text-emerald-600 text-xl"><input type="range" id="retireAge" min="40" max="80" class="w-full slider-ret mt-2"></div>
                         </div>
-
-                        <!-- Asset Location -->
                         <div class="pt-2" data-help="buckets">
-                            <div class="flex justify-between items-end mb-2">
-                                <h3 class="text-xs font-bold text-slate-700">Portfolio Buckets</h3>
-                                <span class="text-[10px] text-slate-400">Total: <span id="total-savings-display" class="font-mono text-indigo-600 font-bold">$0</span></span>
-                            </div>
-                            <div class="grid grid-cols-3 gap-2 mb-4">
-                                <div><label class="bucket-label text-orange-500">Taxable</label><input type="number" id="num-savingsTaxable" class="bucket-input" placeholder="0"></div>
-                                <div><label class="bucket-label text-blue-500">Deferred</label><input type="number" id="num-savingsDeferred" class="bucket-input" placeholder="0"></div>
-                                <div><label class="bucket-label text-emerald-500">Tax-Free</label><input type="number" id="num-savingsFree" class="bucket-input" placeholder="0"></div>
-                            </div>
-                            <div class="flex justify-between items-end mb-2">
-                                <h3 class="text-xs font-bold text-slate-700">Annual Contribution</h3>
-                                <span class="text-[10px] text-slate-400">Total: <span id="total-contrib-display" class="font-mono text-indigo-600 font-bold">$0</span></span>
-                            </div>
-                            <div class="grid grid-cols-3 gap-2">
-                                <div><label class="bucket-label text-orange-500">Taxable</label><input type="number" id="num-contribTaxable" class="bucket-input" placeholder="0"></div>
-                                <div><label class="bucket-label text-blue-500">Deferred</label><input type="number" id="num-contribDeferred" class="bucket-input" placeholder="0"></div>
-                                <div><label class="bucket-label text-emerald-500">Tax-Free</label><input type="number" id="num-contribFree" class="bucket-input" placeholder="0"></div>
-                            </div>
+                            <div class="flex justify-between items-end mb-2"><h3 class="text-xs font-bold text-slate-700">Portfolio Buckets</h3><span class="text-[10px] text-slate-400">Total: <span id="total-savings-display" class="font-mono text-indigo-600 font-bold">$0</span></span></div>
+                            <div class="grid grid-cols-3 gap-2 mb-4"><div><label class="bucket-label text-orange-500">Taxable</label><input type="number" id="num-savingsTaxable" class="bucket-input" placeholder="0"></div><div><label class="bucket-label text-blue-500">Deferred</label><input type="number" id="num-savingsDeferred" class="bucket-input" placeholder="0"></div><div><label class="bucket-label text-emerald-500">Tax-Free</label><input type="number" id="num-savingsFree" class="bucket-input" placeholder="0"></div></div>
+                            <div class="flex justify-between items-end mb-2"><h3 class="text-xs font-bold text-slate-700">Annual Contribution</h3><span class="text-[10px] text-slate-400">Total: <span id="total-contrib-display" class="font-mono text-indigo-600 font-bold">$0</span></span></div>
+                            <div class="grid grid-cols-3 gap-2"><div><label class="bucket-label text-orange-500">Taxable</label><input type="number" id="num-contribTaxable" class="bucket-input" placeholder="0"></div><div><label class="bucket-label text-blue-500">Deferred</label><input type="number" id="num-contribDeferred" class="bucket-input" placeholder="0"></div><div><label class="bucket-label text-emerald-500">Tax-Free</label><input type="number" id="num-contribFree" class="bucket-input" placeholder="0"></div></div>
                         </div>
-
-                        <!-- Macro Econ -->
                         <div class="space-y-4 pt-2 border-t border-slate-100">
                             <div data-help="return"><div class="flex justify-between text-xs font-semibold text-slate-600 mb-1 items-center"><span>Accumulation Return (%)</span><input type="number" id="num-return" class="editable-num text-indigo-600 text-right w-24" step="0.1"></div><input type="range" id="return" min="1" max="12" step="0.1" class="w-full slider-acc"></div>
                             <div data-help="volatility"><div class="flex justify-between text-xs font-semibold text-slate-600 mb-1 items-center"><span>Volatility / Std Dev (%)</span><input type="number" id="num-volatility" class="editable-num text-purple-600 text-right w-24" step="0.1"></div><input type="range" id="volatility" min="0" max="25" step="0.1" class="w-full slider-acc" style="accent-color: #9333ea;"></div>
@@ -172,23 +122,10 @@
                     <div class="space-y-4">
                         <div data-help="retire-return"><div class="flex justify-between text-xs font-semibold text-slate-600 mb-1 items-center"><span>Retirement Return (%)</span><input type="number" id="num-retireReturn" class="editable-num text-emerald-600 text-right w-24" step="0.1"></div><input type="range" id="retireReturn" min="0" max="10" step="0.1" class="w-full slider-ret"></div>
                         <div data-help="expenses"><div class="flex justify-between text-xs font-semibold text-slate-600 mb-1 items-center"><span>Annual Expenses (Net)</span><input type="number" id="num-expenses" class="editable-num text-emerald-600 text-right w-24" step="1000"></div><input type="range" id="expenses" min="20000" max="200000" step="1000" class="w-full slider-ret"></div>
-                        
-                        <!-- Late Life Spending -->
                         <div class="bg-indigo-50 p-2 rounded border border-indigo-100" data-help="late-spending">
                             <label class="text-[10px] font-bold text-indigo-800 uppercase block mb-1">Late-Life Spending Adjustment</label>
-                            <div class="flex gap-2 items-center">
-                                <div class="flex-1">
-                                    <span class="text-[9px] text-slate-500 block">Start Age</span>
-                                    <input type="number" id="num-lateSpendAge" class="bg-white border border-slate-200 rounded text-xs p-1 w-full text-center" value="80">
-                                </div>
-                                <div class="flex-1">
-                                    <span class="text-[9px] text-slate-500 block">% of Baseline</span>
-                                    <input type="number" id="num-lateSpendLevel" class="bg-white border border-slate-200 rounded text-xs p-1 w-full text-center" value="100">
-                                </div>
-                            </div>
-                            <p class="text-[9px] text-slate-400 mt-1 leading-tight">Models reduced spending in later years (e.g. 85% at age 80).</p>
+                            <div class="flex gap-2 items-center"><div class="flex-1"><span class="text-[9px] text-slate-500 block">Start Age</span><input type="number" id="num-lateSpendAge" class="bg-white border border-slate-200 rounded text-xs p-1 w-full text-center" value="80"></div><div class="flex-1"><span class="text-[9px] text-slate-500 block">% of Baseline</span><input type="number" id="num-lateSpendLevel" class="bg-white border border-slate-200 rounded text-xs p-1 w-full text-center" value="100"></div></div>
                         </div>
-
                         <div class="bg-slate-50 p-3 rounded border border-slate-100 mt-2" data-help="tax-rates">
                             <p class="text-[10px] font-bold text-slate-500 uppercase mb-2">Tax Assumptions</p>
                             <div class="grid grid-cols-2 gap-4">
@@ -200,7 +137,7 @@
                     </div>
                 </div>
 
-                <!-- SECTION 3 & 4 (SS & Events) -->
+                <!-- SECTION 3: SOCIAL SECURITY -->
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5" data-help="social-security">
                     <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 border-b pb-2">3. Social Security</h2>
                     <div class="space-y-5">
@@ -266,51 +203,282 @@
         </div>
     </main>
 
-    <!-- AI Copilot Modal -->
+    <!-- Modals -->
     <div id="copilot-modal" class="hidden fixed inset-0 z-[200] overflow-hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
         <div class="absolute inset-0 bg-slate-900/50 transition-opacity backdrop-blur-sm" onclick="app.toggleCopilot()"></div>
-        <div class="absolute inset-y-0 right-0 max-w-sm w-full flex">
-            <div class="relative w-full h-full bg-white shadow-2xl flex flex-col transform transition-transform">
-                <div class="bg-indigo-600 px-4 py-4 flex justify-between items-center text-white">
-                    <div><h2 class="text-lg font-bold">AI Copilot</h2><p class="text-[10px] text-indigo-200">Describe your scenario in plain English.</p></div>
-                    <button onclick="app.toggleCopilot()" class="text-indigo-200 hover:text-white"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+        <div class="absolute inset-y-0 right-0 max-w-sm w-full flex"><div class="relative w-full h-full bg-white shadow-2xl flex flex-col transform transition-transform"><div class="bg-indigo-600 px-4 py-4 flex justify-between items-center text-white"><div><h2 class="text-lg font-bold">AI Copilot</h2><p class="text-[10px] text-indigo-200">Describe your scenario in plain English.</p></div><button onclick="app.toggleCopilot()" class="text-indigo-200 hover:text-white"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button></div><div class="bg-slate-50 p-4 border-b border-slate-200" id="api-config"><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">OpenAI Compatible API Key</label><div class="flex gap-2"><input type="password" id="api-key" class="flex-1 bg-white border border-slate-300 rounded text-xs px-2 py-1.5 focus:outline-none focus:border-indigo-500" placeholder="sk-..."><button onclick="app.saveKey()" class="bg-white border border-slate-300 text-slate-600 text-xs px-3 rounded hover:bg-slate-100">Save</button></div><p class="text-[9px] text-slate-400 mt-1">Stored locally in your browser. Not sent to any server other than OpenAI.</p></div><div class="flex-1 overflow-y-auto p-4 flex flex-col space-y-4 bg-slate-50" id="chat-history"><div class="chat-system">Copilot Ready. Try: "I want to retire at 50 with 2M" or "Add a wedding expense of 30k at age 32"</div></div><div class="p-4 bg-white border-t border-slate-200"><div class="relative"><textarea id="chat-input" rows="2" class="w-full bg-slate-50 border border-slate-300 rounded-lg pl-3 pr-10 py-2 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 resize-none" placeholder="Type your plan..."></textarea><button onclick="app.sendChat()" class="absolute right-2 bottom-2 text-indigo-500 hover:text-indigo-700"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg></button></div></div></div></div>
+    </div>
+    
+    <div id="test-modal" class="hidden fixed inset-0 z-[250] overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:p-0">
+            <div class="fixed inset-0 modal-backdrop" onclick="tests.close()"></div>
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-xl sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6">
+                    <div class="flex justify-between items-start border-b pb-2 mb-4">
+                        <h3 class="text-lg leading-6 font-bold text-gray-900">Unit Test Suite</h3>
+                        <button onclick="tests.close()" class="text-gray-400 hover:text-gray-500">X</button>
+                    </div>
+                    <div id="test-results" class="text-xs font-mono text-slate-600 space-y-2 max-h-[60vh] overflow-y-auto"></div>
                 </div>
-                <div class="bg-slate-50 p-4 border-b border-slate-200" id="api-config"><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">OpenAI Compatible API Key</label><div class="flex gap-2"><input type="password" id="api-key" class="flex-1 bg-white border border-slate-300 rounded text-xs px-2 py-1.5 focus:outline-none focus:border-indigo-500" placeholder="sk-..."><button onclick="app.saveKey()" class="bg-white border border-slate-300 text-slate-600 text-xs px-3 rounded hover:bg-slate-100">Save</button></div><p class="text-[9px] text-slate-400 mt-1">Stored locally in your browser. Not sent to any server other than OpenAI.</p></div>
-                <div class="flex-1 overflow-y-auto p-4 flex flex-col space-y-4 bg-slate-50" id="chat-history"><div class="chat-system">Copilot Ready. Try: "I want to retire at 50 with 2M" or "Add a wedding expense of 30k at age 32"</div></div>
-                <div class="p-4 bg-white border-t border-slate-200"><div class="relative"><textarea id="chat-input" rows="2" class="w-full bg-slate-50 border border-slate-300 rounded-lg pl-3 pr-10 py-2 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 resize-none" placeholder="Type your plan..."></textarea><button onclick="app.sendChat()" class="absolute right-2 bottom-2 text-indigo-500 hover:text-indigo-700"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg></button></div></div>
             </div>
         </div>
     </div>
 
-    <!-- Load/Audit Modals -->
-    <div id="load-modal" class="hidden fixed inset-0 z-[100] overflow-y-auto">
-        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div class="fixed inset-0 modal-backdrop" onclick="app.closeLoadModal()"></div>
-            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                    <div class="flex items-center gap-2 mb-2">
-                        <button id="modal-back-btn" class="hidden text-slate-400 hover:text-indigo-600"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button>
-                        <h3 class="text-lg leading-6 font-medium text-gray-900">Load Scenario</h3>
-                    </div>
-                    <ul id="scenario-list" class="mt-4 divide-y divide-slate-200 max-h-60 overflow-y-auto"></ul>
-                </div>
-                <div class="bg-slate-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                    <button class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm" onclick="app.closeLoadModal()">Cancel</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- Load/Audit Modals (Reuse) -->
+    <div id="load-modal" class="hidden fixed inset-0 z-[100] overflow-y-auto"><div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0"><div class="fixed inset-0 modal-backdrop" onclick="app.closeLoadModal()"></div><div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"><div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4"><div class="flex items-center gap-2 mb-2"><button id="modal-back-btn" class="hidden text-slate-400 hover:text-indigo-600"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button><h3 class="text-lg leading-6 font-medium text-gray-900">Load Scenario</h3></div><ul id="scenario-list" class="mt-4 divide-y divide-slate-200 max-h-60 overflow-y-auto"></ul></div><div class="bg-slate-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse"><button class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm" onclick="app.closeLoadModal()">Cancel</button></div></div></div></div>
     <div id="audit-modal" class="hidden fixed inset-0 z-[150] overflow-y-auto"><div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:p-0"><div class="fixed inset-0 modal-backdrop" onclick="document.getElementById('audit-modal').classList.add('hidden')"></div><div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full"><div class="bg-white px-4 pt-5 pb-4 sm:p-6"><div class="flex justify-between items-start border-b pb-2 mb-4"><h3 class="text-lg leading-6 font-bold text-gray-900" id="audit-title">Audit</h3><button onclick="document.getElementById('audit-modal').classList.add('hidden')" class="text-gray-400 hover:text-gray-500">X</button></div><div id="audit-content" class="text-xs font-mono text-slate-600 space-y-2 max-h-[60vh] overflow-y-auto"></div></div></div></div></div>
 
-    <!-- App Logic -->
+    <!-- LOGIC -->
     <script>
-        // --- Global App Namespace ---
+        // --- 1. CORE MATH ENGINE (Pure Logic) ---
+        class RetirementEngine {
+            constructor() {}
+
+            static randn_bm() {
+                let u=0,v=0; while(u===0)u=Math.random(); while(v===0)v=Math.random();
+                return Math.sqrt(-2.0*Math.log(u))*Math.cos(2.0*Math.PI*v);
+            }
+
+            // The main simulation function - now pure
+            static simulateTrajectory(p, events, useRandom = false, forceCoastFromAge = null) {
+                // Derived Params
+                const effectiveStopContrib = forceCoastFromAge !== null ? forceCoastFromAge : Math.min(p.stopContribAge, p.retireAge);
+                const spouseAgeDiff = p.ssSpouseCurrentAge - p.age;
+                
+                // Initial State
+                let portTaxable = p.savingsTaxable, portDeferred = p.savingsDeferred, portFree = p.savingsFree;
+                let cTax = p.contribTaxable, cDef = p.contribDeferred, cFree = p.contribFree;
+                let expenses = p.expenses, age = p.age, year = new Date().getFullYear();
+                
+                const maxYears = 95 - p.age;
+                let trajectory = [];
+                let tippingAge = null;
+
+                // Rates
+                const rAcc = p.return / 100;
+                const rRet = p.retireReturn / 100;
+                const vol = p.volatility / 100;
+                const inf = p.inflation / 100;
+                const haircut = p.ssHaircut / 100;
+                const taxInc = p.taxRateIncome / 100;
+                const taxCap = p.taxRateCap / 100;
+
+                for (let i = 0; i <= maxYears; i++) {
+                    // Snapshot Start
+                    const startTaxable = portTaxable, startDeferred = portDeferred, startFree = portFree;
+                    
+                    // Flags
+                    const currentSpouseAge = age + spouseAgeDiff;
+                    const isRetired = age >= p.retireAge;
+                    const isContributing = age < effectiveStopContrib;
+                    const isCoasting = !isRetired && !isContributing;
+
+                    // 1. Growth
+                    let rCurrent = isRetired ? rRet : rAcc;
+                    if (useRandom) rCurrent += (vol * this.randn_bm());
+                    
+                    const growthTaxable = portTaxable * rCurrent;
+                    const growthDeferred = portDeferred * rCurrent;
+                    const growthFree = portFree * rCurrent;
+                    
+                    portTaxable += growthTaxable; portDeferred += growthDeferred; portFree += growthFree;
+                    const totalGrowth = growthTaxable + growthDeferred + growthFree;
+
+                    // 2. Social Security & Events
+                    const yearsOfInf = year - new Date().getFullYear(); // Assuming start year is current
+                    // Note: In tests, year logic might need base year. For now assuming current year start.
+                    const inflationFactor = Math.pow(1 + inf, i); // Use loop index for robust rel calc
+
+                    let userSS=0, spouseSS=0;
+                    if (age >= p.ssAge) userSS = (p.ssAmount * 12) * inflationFactor;
+                    if (currentSpouseAge >= p.ssSpouseAge) spouseSS = (p.ssSpouseAmount * 12) * inflationFactor;
+                    const ssTotal = (userSS + spouseSS) * haircut;
+
+                    let eventsSum = 0;
+                    let eventDetails = [];
+                    events.forEach(e => {
+                        if (age >= e.start && age <= e.end) {
+                            const val = e.amt * inflationFactor;
+                            eventsSum += val;
+                            eventDetails.push(`${e.name}: ${val.toFixed(0)}`);
+                        }
+                    });
+
+                    // 3. Flows
+                    let totalTaxPaid=0, netFlowDisplay=0, flow=0;
+                    let withdrawTaxable=0, withdrawDeferred=0, withdrawFree=0;
+                    
+                    // Effective Expenses (Late Life Adjustment)
+                    let effectiveExpenses = expenses;
+                    if (age >= p.lateSpendAge) {
+                        effectiveExpenses = expenses * (p.lateSpendLevel / 100);
+                    }
+
+                    if (!isRetired) {
+                        // Accumulation Phase
+                        if (isContributing) {
+                            portTaxable += cTax; portDeferred += cDef; portFree += cFree;
+                            let annualContrib = cTax + cDef + cFree;
+                            flow += annualContrib;
+                            if (!tippingAge && totalGrowth > annualContrib) tippingAge = age;
+                        }
+                        
+                        // Extra income/expenses flow to taxable
+                        const extraCash = ssTotal + eventsSum;
+                        portTaxable += extraCash; 
+                        flow += extraCash;
+                        netFlowDisplay = flow;
+
+                        if (isContributing) { 
+                            cTax *= (1 + inf); cDef *= (1 + inf); cFree *= (1 + inf); 
+                        }
+                    } else {
+                        // Decumulation Phase
+                        let gap = effectiveExpenses - (ssTotal + eventsSum);
+                        
+                        if (gap < 0) {
+                            // Surplus
+                            portTaxable += Math.abs(gap);
+                            flow += Math.abs(gap);
+                        } else {
+                            // Deficit - Withdraw
+                            let remainingNeed = gap;
+                            
+                            // Waterfall: Taxable -> Deferred -> Free
+                            if (remainingNeed > 0 && portTaxable > 0) {
+                                const effRate = 0.5 * taxCap;
+                                const grossNeeded = remainingNeed / (1 - effRate);
+                                const withdraw = Math.min(portTaxable, grossNeeded);
+                                const tax = withdraw * effRate;
+                                
+                                withdrawTaxable = withdraw;
+                                portTaxable -= withdraw;
+                                remainingNeed -= (withdraw - tax);
+                                totalTaxPaid += tax;
+                                flow -= withdraw;
+                            }
+                            if (remainingNeed > 0 && portDeferred > 0) {
+                                const gross = remainingNeed / (1 - taxInc);
+                                const withdraw = Math.min(portDeferred, gross);
+                                const tax = withdraw * taxInc;
+                                
+                                withdrawDeferred = withdraw;
+                                portDeferred -= withdraw;
+                                remainingNeed -= (withdraw - tax);
+                                totalTaxPaid += tax;
+                                flow -= withdraw;
+                            }
+                            if (remainingNeed > 0 && portFree > 0) {
+                                const withdraw = Math.min(portFree, remainingNeed);
+                                withdrawFree = withdraw;
+                                portFree -= withdraw;
+                                remainingNeed -= withdraw;
+                                flow -= withdraw;
+                            }
+                        }
+                        netFlowDisplay = flow;
+                    }
+
+                    let totalPort = Math.max(0, portTaxable + portDeferred + portFree);
+                    
+                    trajectory.push({
+                        age, year: year + i, // Simple increment
+                        startTaxable, startDeferred, startFree,
+                        endTaxable: portTaxable, endDeferred: portDeferred, endFree: portFree,
+                        growthTaxable, growthDeferred, growthFree, rCurrent,
+                        isRetired, isCoasting, expenses: effectiveExpenses, ssTotal, eventsSum, eventDetails,
+                        drawdown: netFlowDisplay, totalTaxPaid,
+                        withdrawTaxable, withdrawDeferred, withdrawFree, inflationFactor,
+                        startPort: startTaxable + startDeferred + startFree,
+                        portfolio: totalPort,
+                        growth: totalGrowth
+                    });
+
+                    // Inflate baseline expenses for next year
+                    expenses *= (1 + inf);
+                    age++;
+                }
+
+                return { trajectory, tippingAge };
+            }
+        }
+
+        // --- 2. TEST SUITE ---
+        const tests = {
+            run: () => {
+                const results = [];
+                const addResult = (name, pass, msg) => results.push({name, pass, msg});
+                
+                try {
+                    // Test 1: Simple Growth
+                    // $100k, 10% return, 0 contribs. Year 1 should be $110k.
+                    const p1 = { ...defaults, savingsTaxable: 100000, savingsDeferred:0, savingsFree:0, return: 10, inflation: 0, stopContribAge: 35, age: 35, retireAge: 60 };
+                    const r1 = RetirementEngine.simulateTrajectory(p1, []);
+                    const y1Bal = r1.trajectory[0].portfolio;
+                    addResult("Basic Growth (10%)", Math.abs(y1Bal - 110000) < 1, `Expected 110000, got ${y1Bal.toFixed(2)}`);
+
+                    // Test 2: Tax Logic
+                    // Retire immediately. Need $10k net. 100k in Taxable. 20% Cap Gains.
+                    // Assumption in code: 50% of withdraw is gains -> Eff Rate = 10%.
+                    // Gross = 10000 / (1 - 0.10) = 11111.11. Tax = 1111.11.
+                    const p2 = { ...defaults, age: 60, retireAge: 60, expenses: 10000, savingsTaxable: 100000, savingsDeferred:0, savingsFree:0, taxRateCap: 20, return: 0, inflation: 0, ssAmount: 0, ssSpouseAmount: 0 };
+                    const r2 = RetirementEngine.simulateTrajectory(p2, []);
+                    const d2 = r2.trajectory[0];
+                    const expectedTax = 1111.11;
+                    addResult("Taxable Withdrawal Math", Math.abs(d2.totalTaxPaid - expectedTax) < 1, `Expected tax ~1111.11, got ${d2.totalTaxPaid.toFixed(2)}`);
+
+                    // Test 3: Event Injection
+                    // Add 50k at age 40.
+                    const p3 = { ...defaults, age: 39, retireAge: 60, savingsTaxable: 0, savingsDeferred:0, savingsFree:0, return: 0, inflation: 0, contribTaxable:0, contribDeferred:0, contribFree:0 };
+                    const ev3 = [{id:1, name:'Windfall', start:40, end:40, amt:50000}];
+                    const r3 = RetirementEngine.simulateTrajectory(p3, ev3);
+                    // Age 39 (index 0): 0. Age 40 (index 1): +50k.
+                    addResult("Event Cashflow", Math.abs(r3.trajectory[1].drawdown - 50000) < 1, `Expected 50k inflow at age 40, got ${r3.trajectory[1].drawdown}`);
+
+                    // Test 4: Coast Logic
+                    // Stop contrib at 40. Retire 60. 
+                    const p4 = { ...defaults, age:35, stopContribAge: 40, retireAge: 60, contribTaxable: 10000, contribDeferred:0, contribFree:0, inflation:0 };
+                    const r4 = RetirementEngine.simulateTrajectory(p4, []);
+                    // Check if contribs stop at age 40 (index 5)
+                    const idx40 = 5;
+                    addResult("Coast Stop Contrib", r4.trajectory[idx40].contribution === undefined && r4.trajectory[idx40].drawdown === 0, "Contributions should be 0 after stop age");
+
+                    // Test 5: Late Spending
+                    // Expenses 100k. Late Age 80. Level 80%.
+                    // At age 80, effective expense should be 80k (assuming 0 inflation for simplicity test).
+                    const p5 = { ...defaults, age: 79, retireAge: 60, expenses: 100000, inflation: 0, lateSpendAge: 80, lateSpendLevel: 80, ssAmount: 0, ssSpouseAmount: 0 };
+                    const r5 = RetirementEngine.simulateTrajectory(p5, []);
+                    // Index 0 (Age 79): Exp 100k. Index 1 (Age 80): Exp 80k.
+                    addResult("Late Spending Adj", r5.trajectory[1].expenses === 80000, `Expected 80k exp at age 80, got ${r5.trajectory[1].expenses}`);
+
+                } catch(e) {
+                    addResult("Test Runner Error", false, e.message);
+                }
+
+                tests.showUI(results);
+            },
+
+            showUI: (results) => {
+                const modal = document.getElementById('test-modal');
+                const content = document.getElementById('test-results');
+                modal.classList.remove('hidden');
+                
+                content.innerHTML = results.map(r => `
+                    <div class="flex justify-between items-center border-b border-slate-100 pb-1">
+                        <span class="font-bold ${r.pass ? 'text-emerald-600' : 'text-red-500'}">${r.pass ? 'PASS' : 'FAIL'}</span>
+                        <span class="flex-1 ml-3">${r.name}</span>
+                        ${!r.pass ? `<span class="text-xs text-red-400">${r.msg}</span>` : ''}
+                    </div>
+                `).join('');
+            },
+            close: () => document.getElementById('test-modal').classList.add('hidden')
+        };
+
+
+        // --- 3. UI & APP CONTROLLER ---
         const app = {
             data: {},
             events: [], 
-            elements: {},
-            chart: null,
-            scenarioName: "Unnamed Scenario",
             helpMode: false,
             apiKey: localStorage.getItem('fire_api_key') || '',
             helpData: {
@@ -694,7 +862,7 @@
             document.getElementById('audit-content').innerHTML=html;
         };
 
-        // --- Save/Load Logic (Updated for Grouping) ---
+        // --- Save/Load Logic ---
         app.saveToLocal = () => {
             const saves = JSON.parse(localStorage.getItem('fire_scenarios') || '[]');
             if(!app.scenarioName.trim()) { alert("Please name your scenario"); return; }
@@ -703,87 +871,36 @@
             localStorage.setItem('fire_scenarios', JSON.stringify(saves));
             const btn = document.activeElement; btn.innerHTML = `<span class="text-emerald-400">Saved!</span>`; setTimeout(() => btn.innerHTML = '<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg> Save', 1500);
         };
-
         app.openLoadModal = () => {
             const modal = document.getElementById('load-modal');
             const list = document.getElementById('scenario-list');
             const backBtn = document.getElementById('modal-back-btn');
-            
             if(backBtn) { backBtn.classList.add('hidden'); backBtn.onclick = null; }
             document.querySelector('#load-modal h3').innerText = "Load Scenario";
-
             const saves = JSON.parse(localStorage.getItem('fire_scenarios') || '[]');
             modal.classList.remove('hidden');
             if (saves.length === 0) { list.innerHTML = `<li class="py-4 text-center text-slate-500 text-sm">No saved scenarios.</li>`; return; }
-            
-            const groups = {};
-            saves.forEach(s => { if(!groups[s.name]) groups[s.name] = []; groups[s.name].push(s); });
+            const groups = {}; saves.forEach(s => { if(!groups[s.name]) groups[s.name] = []; groups[s.name].push(s); });
             const sortedNames = Object.keys(groups).sort((a,b) => Math.max(...groups[b].map(s=>s.id)) - Math.max(...groups[a].map(s=>s.id)));
-
             list.innerHTML = sortedNames.map(name => {
                 const versions = groups[name].sort((a,b) => b.id - a.id);
                 const latest = versions[0];
-                return `
-                <li class="py-3 px-2 hover:bg-slate-50 flex justify-between items-center group">
-                    <div class="cursor-pointer flex-1" onclick="app.loadScenario(${latest.id})">
-                        <div class="flex items-center gap-2">
-                            <span class="text-sm font-medium text-indigo-700">${name}</span>
-                            ${versions.length > 1 ? `<span class="text-[10px] bg-slate-200 text-slate-600 px-1.5 rounded-full">${versions.length} v</span>` : ''}
-                        </div>
-                        <div class="text-xs text-slate-400">Latest: ${latest.date}</div>
-                    </div>
-                    <div class="flex items-center gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-                         ${versions.length > 1 ? `<button onclick="app.showVersions('${name.replace(/'/g, "\\'")}')" class="text-indigo-400 hover:text-indigo-600 text-xs px-2 border border-slate-200 rounded py-1">History</button>` : ''}
-                         <button onclick="event.stopPropagation(); app.deleteGroup('${name.replace(/'/g, "\\'")}')" class="text-red-400 hover:text-red-600 text-xs px-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
-                    </div>
-                </li>`;
+                return `<li class="py-3 px-2 hover:bg-slate-50 flex justify-between items-center group"><div class="cursor-pointer flex-1" onclick="app.loadScenario(${latest.id})"><div class="flex items-center gap-2"><span class="text-sm font-medium text-indigo-700">${name}</span>${versions.length > 1 ? `<span class="text-[10px] bg-slate-200 text-slate-600 px-1.5 rounded-full">${versions.length} v</span>` : ''}</div><div class="text-xs text-slate-400">Latest: ${latest.date}</div></div><div class="flex items-center gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">${versions.length > 1 ? `<button onclick="app.showVersions('${name.replace(/'/g, "\\'")}')" class="text-indigo-400 hover:text-indigo-600 text-xs px-2 border border-slate-200 rounded py-1">History</button>` : ''}<button onclick="event.stopPropagation(); app.deleteGroup('${name.replace(/'/g, "\\'")}')" class="text-red-400 hover:text-red-600 text-xs px-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button></div></li>`;
             }).join('');
         };
-
         app.showVersions = (name) => {
             const list = document.getElementById('scenario-list');
             const backBtn = document.getElementById('modal-back-btn');
             document.querySelector('#load-modal h3').innerText = `Versions: ${name}`;
-            
             if(backBtn) { backBtn.classList.remove('hidden'); backBtn.onclick = app.openLoadModal; }
-
             const saves = JSON.parse(localStorage.getItem('fire_scenarios') || '[]');
             const versions = saves.filter(s => s.name === name).sort((a,b) => b.id - a.id);
-
-            list.innerHTML = versions.map(v => `
-                <li class="py-3 px-2 hover:bg-slate-50 flex justify-between items-center group cursor-pointer" onclick="app.loadScenario(${v.id})">
-                    <div>
-                        <div class="text-sm font-medium text-slate-700">${v.date}</div>
-                        <div class="text-xs text-slate-400">ID: ${v.id}</div>
-                    </div>
-                    <div class="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-                         <button onclick="event.stopPropagation(); app.deleteVersion(${v.id}, '${name.replace(/'/g, "\\'")}')" class="text-red-400 hover:text-red-600 text-xs px-2">Delete</button>
-                    </div>
-                </li>
-            `).join('');
+            list.innerHTML = versions.map(v => `<li class="py-3 px-2 hover:bg-slate-50 flex justify-between items-center group cursor-pointer" onclick="app.loadScenario(${v.id})"><div><div class="text-sm font-medium text-slate-700">${v.date}</div><div class="text-xs text-slate-400">ID: ${v.id}</div></div><div class="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"><button onclick="event.stopPropagation(); app.deleteVersion(${v.id}, '${name.replace(/'/g, "\\'")}')" class="text-red-400 hover:text-red-600 text-xs px-2">Delete</button></div></li>`).join('');
         };
-
-        app.deleteGroup = (name) => {
-            if(!confirm(`Delete all versions of "${name}"?`)) return;
-            const saves = JSON.parse(localStorage.getItem('fire_scenarios') || '[]');
-            const filtered = saves.filter(s => s.name !== name);
-            localStorage.setItem('fire_scenarios', JSON.stringify(filtered));
-            app.openLoadModal();
-        };
-
-        app.deleteVersion = (id, name) => {
-            const saves = JSON.parse(localStorage.getItem('fire_scenarios') || '[]');
-            const filtered = saves.filter(s => s.id !== id);
-            localStorage.setItem('fire_scenarios', JSON.stringify(filtered));
-            // Check remaining
-            if(filtered.some(s => s.name === name)) app.showVersions(name);
-            else app.openLoadModal();
-        };
-
+        app.deleteGroup = (name) => { if(!confirm(`Delete all versions of "${name}"?`)) return; const saves = JSON.parse(localStorage.getItem('fire_scenarios') || '[]'); const filtered = saves.filter(s => s.name !== name); localStorage.setItem('fire_scenarios', JSON.stringify(filtered)); app.openLoadModal(); };
+        app.deleteVersion = (id, name) => { const saves = JSON.parse(localStorage.getItem('fire_scenarios') || '[]'); const filtered = saves.filter(s => s.id !== id); localStorage.setItem('fire_scenarios', JSON.stringify(filtered)); if(filtered.some(s => s.name === name)) app.showVersions(name); else app.openLoadModal(); };
         app.closeLoadModal=()=>document.getElementById('load-modal').classList.add('hidden');
         app.loadScenario=(id)=>{const s=JSON.parse(localStorage.getItem('fire_scenarios')).find(x=>x.id===id);if(s){app.loadData(s.data,s.name);app.closeLoadModal();}};
-        
-        // --- Import/Export ---
         app.loadData=(data,name)=>{if(name){app.scenarioName=name;document.getElementById('scenario-name').value=name;}Object.keys(data).forEach(key=>{if(inputs[key]){if(inputs[key].range)inputs[key].range.value=data[key];if(inputs[key].num)inputs[key].num.value=data[key];}});app.events=data.events||[];app.renderEventsList();calculate();};
         app.importJson=(input)=>{const r=new FileReader();r.onload=(e)=>app.loadData(JSON.parse(e.target.result).data,JSON.parse(e.target.result).name);r.readAsText(input.files[0]);input.value='';};
         app.exportTableJson=()=>{if(!chartData.length)return;const s="data:text/json;charset=utf-8,"+encodeURIComponent(JSON.stringify(chartData,null,2));const l=document.createElement('a');l.href=s;l.download=`${app.scenarioName}_Breakdown.json`;document.body.appendChild(l);l.click();l.remove();};
